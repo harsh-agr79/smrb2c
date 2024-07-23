@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class OrderAdminController extends Controller {
     public function orders( Request $request ) {
         $result[ 'date' ] = '';

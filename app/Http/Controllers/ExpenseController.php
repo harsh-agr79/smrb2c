@@ -6,6 +6,7 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class ExpenseController extends Controller
 {
     public function index(Request $request){

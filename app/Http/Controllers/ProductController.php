@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Image;
 
+
 class ProductController extends Controller {
     public function getproduct() {
         $c = DB::table( 'products' )->get();

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Image;
 
+
 class BrandController extends Controller
 {
     public function index(){

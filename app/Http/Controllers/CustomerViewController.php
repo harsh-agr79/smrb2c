@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Image;
 
+
 class CustomerViewController extends Controller
 {
     public function profile(){
