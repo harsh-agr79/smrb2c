@@ -62,6 +62,9 @@ class ProductController extends Controller {
             'price'=>$request->post( 'price' ),
             'offer'=>$request->post( 'offer' ),
             'featured'=>$request->post( 'featured' ),
+            'new'=>$request->post( 'new' ),
+            'flash'=>$request->post( 'flash' ),
+            'trending'=>$request->post( 'trending' ),
             'details'=>$request->post( 'details' ),
             'net'=>$request->post('net'),
             'images'=>implode( '|', $image ),
@@ -80,6 +83,7 @@ class ProductController extends Controller {
     }
 
     public function editprod_process( Request $request ) {
+        // dd($request->post());
         $request->validate( [
             'name'=>'required|unique:products,name,'.$request->post( 'id' ),
         ] );
@@ -123,6 +127,9 @@ class ProductController extends Controller {
             'price'=>$request->post( 'price' ),
             'offer'=>$request->post( 'offer' ),
             'featured'=>$request->post( 'featured' ),
+            'new'=>$request->post( 'new' ),
+            'flash'=>$request->post( 'flash' ),
+            'trending'=>$request->post( 'trending' ),
             'details'=>$request->post( 'details' ),
             'net'=>$request->post('net'),
             'images'=>implode( '|', $image )

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -30,7 +31,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['token' => $token], 200);
+        return response()->json(['token' => $token, 'user'=>DB::table('users')->where('email',$request->email)->first()], 200);
     }
 
     public function login(Request $request)
@@ -41,7 +42,7 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            return response()->json(['token' => $token], 200);
+            return response()->json(['token' => $token, 'user'=> $user], 200);
         }
 
         return response()->json(['error' => 'Unauthorized'], 401);

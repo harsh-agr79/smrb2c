@@ -1,6 +1,18 @@
 @extends('layouts.admin')
 
 @section('main')
+<style>
+    .ql-editor {
+        color: black !important;
+    }
+
+    strong {
+        color: black;
+        font-weight: 600;
+    }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+
     <div>
         <h5 class="center">Product</h5>
         @error('name')
@@ -51,26 +63,39 @@
                         </label>
                         <br>
                         <label>
-                            <input type="checkbox" name="featured"/>
+                            <input type="checkbox" name="new" />
                             <span>New Launch</span>
                         </label>
                         <br>
                         <label>
-                            <input type="checkbox" name="net"/>
-                            <span>Net</span>
+                            <input type="checkbox" name="featured" />
+                            <span>Featured</span>
                         </label>
+                        <br>
+                        <label>
+                            <input type="checkbox" name="trending" />
+                            <span>Treding</span>
+                        </label>
+                        <br>
+                        <label>
+                            <input type="checkbox" name="flash" />
+                            <span>Flash</span>
+                        </label>
+                        <br>
                     </div>
                     <div class="col m6 s12">
                         <label>Price :</label><input name="price" type="number" class="browser-default inp"
                             placeholder="Price" required>
                     </div>
-                    <div class="col m6 s12">
+                    {{-- <div class="col m6 s12">
                         <label> Offer :</label><input name="offer" type="text" class="browser-default inp"
                             placeholder="Offer">
-                    </div>
+                    </div> --}}
                     <div class="col s12" style="margin-top: 20px;">
-                        <label>Details :</label>
-                        <textarea name="details" class="browser-default inp" style="resize: vertical;" placeholder="Details"></textarea>
+                        <div id="editor">
+                          
+                        </div>
+                        <input type="hidden" name="details" id="details">
                     </div>
                     <div class="col s12 file-field input-field">
                         <div class="btn">
@@ -88,7 +113,58 @@
             </form>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
     <script>
+          const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{
+                        'header': [1, 2, 3, 4, 5, 6, false]
+                    }],
+                    ['bold', 'italic', 'underline'],
+                    [{
+                        'list': 'ordered'
+                    }, {
+                        'list': 'bullet'
+                    }],
+                    ['blockquote'],
+                    [{
+                        'align': []
+                    }],
+                    [{
+                        'color': []
+                    }, {
+                        'background': []
+                    }],
+                    [{
+                        'indent': '-1'
+                    }, {
+                        'indent': '+1'
+                    }],
+                    // [{ 'direction': 'rtl' }],
+                ]
+            }
+        });
+
+        function addClassToSelectsInToolbar() {
+            // Find all 'select' elements within '.ql-toolbar .ql-formats'
+            const selects = document.querySelectorAll('.ql-toolbar .ql-formats select');
+            const p = document.querySelectorAll('p');
+            // const p = document.querySelectorAll('.editor .ql-editor p');
+
+            // Add the 'browser-default' class to each 'select' element
+            selects.forEach(select => {
+                select.classList.add('browser-default');
+            });
+            // p.forEach(select => {
+            //     select.style.all = "unset";
+            // });
+        }
+
+        // Call the function to apply the class
+        addClassToSelectsInToolbar();
         $(document).ready(function() {
             if (window.File && window.FileList && window.FileReader) {
                 $("#files").on("change", function(e) {
@@ -121,6 +197,10 @@
             } else {
                 alert("Your browser doesn't support to File API")
             }
+            $('form').on('submit', function () {
+                // Set the value of the hidden input field to the HTML content of the editor
+                $('#details').val(quill.root.innerHTML);
+            });
         });
     </script>
 @endsection
