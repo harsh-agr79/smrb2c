@@ -179,7 +179,7 @@
                             </div>
                         </li>
                     @endif
-                    @if ($admin->type != 'staff' || in_array('statements', $perms))
+                    {{-- @if ($admin->type != 'staff' || in_array('statements', $perms))
                         <li class="bold"><a class="collapsible-header textcol" tabindex="0">Statements<i
                                     class="material-icons chevron textcol">chevron_left</i></a>
                             <div class="collapsible-body">
@@ -190,8 +190,8 @@
                                 </ul>
                             </div>
                         </li>
-                    @endif
-                    @if (
+                    @endif --}}
+                    {{-- @if (
                         $admin->type != 'staff' ||
                             in_array('mainanalytics', $perms) ||
                             in_array('sortanalytics', $perms) ||
@@ -215,7 +215,7 @@
                                 </ul>
                             </div>
                         </li>
-                    @endif
+                    @endif --}}
                     @if ($admin->type != 'staff')
                         <li class="bold  green"><a class="collapsible-header" tabindex="0">Company<i
                                     class="material-icons chevron">chevron_left</i></a>
@@ -228,14 +228,14 @@
                                                 </i></a></li>
                                     @endif
                                     @if ($admin->type != 'staff')
-                                        <li><a href="{{ url('marketer') }}" class=" active">Marketer<i
+                                        {{-- <li><a href="{{ url('marketer') }}" class=" active">Marketer<i
                                                     class="material-symbols-outlined">
                                                     person
                                                 </i></a></li>
                                         <li><a href="{{ url('addmarketer') }}" class=" active"> Add Marketer<i
                                                     class="material-symbols-outlined">
                                                     person_add
-                                                </i></a></li>
+                                                </i></a></li> --}}
                                         <li><a href="{{ url('staff') }}" class=" active">Staffs<i
                                                     class="material-symbols-outlined">
                                                     person
@@ -258,15 +258,15 @@
                                         <li><a href="{{ url('/customers') }}" class="textcol">View Customers<i
                                                     class="material-icons textcol">people</i></a></li>
                                     @endif
-                                    @if ($admin->type != 'staff' || in_array('customers/add', $perms))
+                                    {{-- @if ($admin->type != 'staff' || in_array('customers/add', $perms))
                                         <li><a href="{{ url('/customers/add') }}" class="textcol">Add Customer<i
                                                     class="material-icons textcol">person_add</i></a></li>
-                                    @endif
+                                    @endif --}}
                                 </ul>
                             </div>
                         </li>
                     @endif
-                    @if ($admin->type != 'staff' || in_array('payments', $perms) || in_array('addpayments', $perms))
+                    {{-- @if ($admin->type != 'staff' || in_array('payments', $perms) || in_array('addpayments', $perms))
                         <li class="bold"><a class="collapsible-header textcol"
                                 tabindex="0">Payments/Salesreturn<i
                                     class="material-icons chevron textcol">chevron_left</i></a>
@@ -284,8 +284,8 @@
                                 </ul>
                             </div>
                         </li>
-                    @endif
-                    @if ($admin->type != 'staff' || in_array('slr', $perms) || in_array('createslr', $perms))
+                    @endif --}}
+                    {{-- @if ($admin->type != 'staff' || in_array('slr', $perms) || in_array('createslr', $perms))
                         <li class="bold"><a class="collapsible-header textcol" tabindex="0">Sales Return<i
                                     class="material-icons chevron textcol">chevron_left</i></a>
                             <div class="collapsible-body">
@@ -301,8 +301,8 @@
                                 </ul>
                             </div>
                         </li>
-                    @endif
-                    @if ($admin->type != 'staff' || in_array('expenses', $perms) || in_array('addexpense', $perms))
+                    @endif --}}
+                    {{-- @if ($admin->type != 'staff' || in_array('expenses', $perms) || in_array('addexpense', $perms))
                         <li class="bold"><a class="collapsible-header textcol" tabindex="0">Expenses<i
                                     class="material-icons chevron textcol">chevron_left</i></a>
                             <div class="collapsible-body">
@@ -318,7 +318,7 @@
                                 </ul>
                             </div>
                         </li>
-                    @endif
+                    @endif --}}
                     @if (
                         $admin->type != 'staff' ||
                             in_array('brands', $perms) ||
@@ -349,12 +349,12 @@
                             </div>
                         </li>
                     @endif
-                    @if ($admin->type != 'staff' || in_array('frontsettings', $perms))
+                    {{-- @if ($admin->type != 'staff' || in_array('frontsettings', $perms))
                         <li class="bold"><a href="{{ url('/frontsettings') }}" class="textcol">Front Settings<i
                                     class="material-icons textcol">settings</i></a></li>
                         <li class="bold"><a href="{{ url('/trash') }}" class="textcol">Recycle Bin<i
                                     class="material-icons textcol">delete</i></a></li>
-                    @endif
+                    @endif --}}
                 </ul>
             </li>
         </ul>
