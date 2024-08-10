@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,7 @@ class CustomerController extends Controller
 {
 
     public function customers(){
-        $result['data'] = Customer::get();
+        $result['data'] = User::get();
         return view('admin.customers',$result);
     }
     public function addcustomer(){

@@ -20,13 +20,10 @@
             <table>
                 <thead>
                     <th>SN</th>
-                    <th>DP</th>
                     <th>Name</th>
-                    <th>Shopname</th>
-                    <th>User ID</th>
                     <th>Email</th>
-                    <th>Address</th>
-                    <th>Contact</th>
+                    {{-- <th>Address</th> --}}
+                    {{-- <th>Contact</th> --}}
                 </thead>
                 <tbody>
                     @php
@@ -35,19 +32,13 @@
                     @foreach ($data as $item)
                         <tr oncontextmenu="rightmenu({{ $item->id }}); return false;">
                             <td>{{$a = $a + 1}}</td>
-                            <td>
-                                @if ($item->profileimg == NULL)
-                                <img src="{{asset('images/user.png')}}" class="materialboxed table-dp">
-                                @else
-                                <img src="{{asset($item->profileimg)}}" class="materialboxed table-dp">
-                                @endif</td>
                             <td>{{$item->name}}</td>
-                            <td>{{$item->shopname}}</td>
-                            <td>{{$item->userid}}</td>
+                            <td>{{$item->email}}</td>
+                            {{-- <td>{{$item->userid}}</td>
                             <td>{{$item->email}}</td>
                             <td>{{$item->address}}</td>
                             <td>{{$item->contact}}</td>
-                        <td class="iphone"><a class="modal-trigger btn-flat" href="#menumodal" onclick="changelink('/customers/edit/{{$item->id}}','/customers/delcust/{{$item->id}}')"><i class="material-icons">more_vert</i></a></td>
+                        <td class="iphone"><a class="modal-trigger btn-flat" href="#menumodal" onclick="changelink('/customers/edit/{{$item->id}}','/customers/delcust/{{$item->id}}')"><i class="material-icons">more_vert</i></a></td> --}}
                         </tr>
                     @endforeach
                 </tbody>
@@ -55,7 +46,7 @@
         </div>
     </div>
 
-    <div id="rightmenu" class="rmenu">
+    {{-- <div id="rightmenu" class="rmenu">
         <ul>
             <a id="rmeditlink">
                 <li>Edit</li>
@@ -64,7 +55,7 @@
                 <li>Delete</li>
             </a>
         </ul>
-    </div>
+    </div> --}}
     <script>
          $(document).ready(function(){
   $('.modal').modal();
