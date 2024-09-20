@@ -11,14 +11,80 @@ use Image;
 
 
 class ProductController extends Controller {
-    public function getproduct() {
-        $c = DB::table( 'products' )->orderBy('ordernum', 'ASC')->get();
-        return response()->json( $c );
-    }
+    public function getproduct(Request $request){
+            $query = DB::table('products')->orderBy('ordernum', 'ASC');
+            if ($request->has('brand')) {
+                $query->where('brand_id', $request->input('brand'));
+            }
+            if ($request->has('category')) {
+                $query->where('category_id', $request->input('category'));
+            }
+            if ($request->has('price_min')) {
+                $query->where('price', '>=', $request->input('price_min'));
+            }
+            if ($request->has('price_max')) {
+                $query->where('price', '<=', $request->input('price_max'));
+            }
+            if ($request->has('stock')) {
+                $query->where('stock', $request->input('stock'));
+            }
+            if ($request->has('featured')) {
+                $query->where('featured', $request->input('featured'));
+            }
+            if ($request->has('new')) {
+                $query->where('new', $request->input('new'));
+            }
+            if ($request->has('flash')) {
+                $query->where('flash', $request->input('new'));
+            }
+            if ($request->has('trending')) {
+                $query->where('trending', $request->input('new'));
+            }
+            if ($request->has('featured')) {
+                $query->where('featured', $request->input('new'));
+            }
+            // Execute the query and get the results
+            $c = $query->get();
+        
+            return response()->json($c);
+        }
 
     public function getproduct2() {
-        $c = DB::table( 'products' )->orderBy('ordernum', 'ASC')->paginate(20);
-        return response()->json( $c );
+        $query = DB::table('products')->orderBy('ordernum', 'ASC');
+        if ($request->has('brand')) {
+            $query->where('brand_id', $request->input('brand'));
+        }
+        if ($request->has('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+        if ($request->has('price_min')) {
+            $query->where('price', '>=', $request->input('price_min'));
+        }
+        if ($request->has('price_max')) {
+            $query->where('price', '<=', $request->input('price_max'));
+        }
+        if ($request->has('stock')) {
+            $query->where('stock', $request->input('stock'));
+        }
+        if ($request->has('featured')) {
+            $query->where('featured', $request->input('featured'));
+        }
+        if ($request->has('new')) {
+            $query->where('new', $request->input('new'));
+        }
+        if ($request->has('flash')) {
+            $query->where('flash', $request->input('new'));
+        }
+        if ($request->has('trending')) {
+            $query->where('trending', $request->input('new'));
+        }
+        if ($request->has('featured')) {
+            $query->where('featured', $request->input('new'));
+        }
+        // Execute the query and get the results
+        $c = $query->paginate(20);
+    
+        return response()->json($c);
     }
 
     public function getproductdetail( Request $request, $id ) {
