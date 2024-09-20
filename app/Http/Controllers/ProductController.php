@@ -12,7 +12,7 @@ use Image;
 
 class ProductController extends Controller {
     public function getproduct() {
-        $c = DB::table( 'products' )->orderBy('ordernum', 'ASC')->paginate(20);
+        $c = DB::table( 'products' )->orderBy('ordernum', 'ASC')->get();
         return response()->json( $c );
     }
 
