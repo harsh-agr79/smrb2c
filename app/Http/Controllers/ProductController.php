@@ -16,6 +16,11 @@ class ProductController extends Controller {
         return response()->json( $c );
     }
 
+    public function getproduct2() {
+        $c = DB::table( 'products' )->orderBy('ordernum', 'ASC')->paginate(20);
+        return response()->json( $c );
+    }
+
     public function getproductdetail( Request $request, $id ) {
         $c = DB::table( 'products' )->where( 'id', $id )->first();
         return response()->json( $c );
