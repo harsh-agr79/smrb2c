@@ -49,7 +49,7 @@ class ProductController extends Controller {
             return response()->json($c);
         }
 
-    public function getproduct2() {
+    public function getproduct2(Request $request) {
         $query = DB::table('products')->orderBy('ordernum', 'ASC');
         if ($request->has('brand')) {
             $query->where('brand_id', $request->input('brand'));
