@@ -13,6 +13,10 @@ class CategoryController extends Controller
             $result['data'] = Category::get();
             return view('admin.category',$result);
     }
+    public function getCategoryApi(){
+        $category = Category::get();
+        return response()->json($category, 200);
+    }
     public function getcategory($id){
         $category = Category::where('id', $id)->first();
         return response()->json($category, 200);

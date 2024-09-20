@@ -15,6 +15,10 @@ class BrandController extends Controller
             $result['data'] = Brand::get();
             return view('admin.brands',$result);
     }
+    public function getBrands(){
+        $brand = Brand::get();
+        return response()->json($brand, 200);
+    }
     public function getbrand($id){
         $brand = Brand::where('id', $id)->first();
         return response()->json($brand, 200);

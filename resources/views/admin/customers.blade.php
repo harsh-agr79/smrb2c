@@ -45,7 +45,6 @@
             </table>
         </div>
     </div>
-
     {{-- <div id="rightmenu" class="rmenu">
         <ul>
             <a id="rmeditlink">
