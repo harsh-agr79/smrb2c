@@ -50,7 +50,9 @@ class ProductController extends Controller {
         }
 
     public function getproduct2(Request $request) {
-        $query = DB::table('products')->orderBy('ordernum', 'ASC');
+        $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
+
+        // Apply filters from getproduct2 logic
         if ($request->has('brand')) {
             $query->where('brand_id', $request->get('brand'));
         }
@@ -78,13 +80,46 @@ class ProductController extends Controller {
         if ($request->has('trending')) {
             $query->where('trending', $request->get('trending'));
         }
-        if ($request->has('featured')) {
-            $query->where('featured', $request->get('featured'));
-        }
-        // Execute the query and get the results
-        $c = $query->paginate(20);
     
-        return response()->json($c);
+        // Universal search logic
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+    
+            // List of regular searchable fields
+            $searchableFields = [
+                'name',
+                'brand',
+                'category',
+                'price',
+                'details',
+            ];
+    
+            // List of special fields (these should match 'not null' if the search term matches them)
+            $specialFields = [
+                'featured',
+                'trending',
+                'flash',
+                'offer',
+                'new',
+            ];
+    
+            // If the search term matches one of the special fields
+            if (in_array($searchTerm, $specialFields)) {
+                $query->whereNotNull($searchTerm)->orWhere($searchTerm, true);
+            } else {
+                // General search across all fields
+                $query->where(function ($q) use ($searchableFields, $searchTerm) {
+                    foreach ($searchableFields as $field) {
+                        $q->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
+                    }
+                });
+            }
+        }
+    
+        // Execute the query and paginate the results
+        $results = $query->paginate(20);
+    
+        return response()->json($results);
     }
 
     public function maxPrice(){
@@ -92,6 +127,7 @@ class ProductController extends Controller {
     
         return response()->json($maxPrice);
     }
+    
 
     public function getproductdetail( Request $request, $id ) {
         $c = DB::table( 'products' )->where( 'id', $id )->first();
