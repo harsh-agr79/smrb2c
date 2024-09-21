@@ -52,74 +52,95 @@ class ProductController extends Controller {
     public function getproduct2(Request $request) {
         $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
 
-        // Apply filters from getproduct2 logic
-        if ($request->has('brand')) {
-            $query->where('brand_id', $request->get('brand'));
+    // Apply filters for brand and category (arrays of IDs)
+    if ($request->has('brand')) {
+        $brandIds = $request->get('brand'); // Get the brand from the request
+        // Check if the brand parameter is a string in array format (e.g., "[8,9,10]")
+        if (is_string($brandIds) && preg_match('/^\[.*\]$/', $brandIds)) {
+            // Convert the string to an array
+            $brandIds = json_decode($brandIds, true);
         }
-        if ($request->has('category')) {
-            $query->where('category_id', $request->get('category'));
+        if (is_array($brandIds)) {
+            $query->whereIn('brand_id', $brandIds);
+        } else {
+            $query->where('brand_id', $brandIds);
         }
-        if ($request->has('price_min')) {
-            $query->where('price', '>=', $request->get('price_min'));
+    }
+
+    if ($request->has('category')) {
+        $categoryIds = $request->get('category');
+        if (is_string($categoryIds) && preg_match('/^\[.*\]$/', $categoryIds)) {
+            $categoryIds = json_decode($categoryIds, true);
         }
-        if ($request->has('price_max')) {
-            $query->where('price', '<=', $request->get('price_max'));
+        if (is_array($categoryIds)) {
+            $query->whereIn('category_id', $categoryIds);
+        } else {
+            $query->where('category_id', $categoryIds);
         }
-        if ($request->has('stock')) {
-            $query->where('stock', $request->get('stock'));
+    }
+
+    // Apply other filters (price range, stock, etc.)
+    if ($request->has('price_min')) {
+        $query->where('price', '>=', $request->get('price_min'));
+    }
+    if ($request->has('price_max')) {
+        $query->where('price', '<=', $request->get('price_max'));
+    }
+    if ($request->has('stock')) {
+        $query->where('stock', $request->get('stock'));
+    }
+    if ($request->has('featured')) {
+        $query->where('featured', $request->get('featured'));
+    }
+    if ($request->has('new')) {
+        $query->where('new', $request->get('new'));
+    }
+    if ($request->has('flash')) {
+        $query->where('flash', $request->get('flash'));
+    }
+    if ($request->has('trending')) {
+        $query->where('trending', $request->get('trending'));
+    }
+
+    // Universal search logic
+    if ($request->has('search')) {
+        $searchTerm = $request->input('search');
+
+        // List of regular searchable fields
+        $searchableFields = [
+            'name',
+            'brand',
+            'category',
+            'price',
+            'details',
+        ];
+
+        // List of special fields (these should match 'not null' if the search term matches them)
+        $specialFields = [
+            'featured',
+            'trending',
+            'flash',
+            'offer',
+            'new',
+        ];
+
+        // If the search term matches one of the special fields
+        if (in_array($searchTerm, $specialFields)) {
+            $query->whereNotNull($searchTerm)->orWhere($searchTerm, true);
+        } else {
+            // General search across all fields
+            $query->where(function ($q) use ($searchableFields, $searchTerm) {
+                foreach ($searchableFields as $field) {
+                    $q->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
+                }
+            });
         }
-        if ($request->has('featured')) {
-            $query->where('featured', $request->get('featured'));
-        }
-        if ($request->has('new')) {
-            $query->where('new', $request->get('new'));
-        }
-        if ($request->has('flash')) {
-            $query->where('flash', $request->get('flash'));
-        }
-        if ($request->has('trending')) {
-            $query->where('trending', $request->get('trending'));
-        }
-    
-        // Universal search logic
-        if ($request->has('search')) {
-            $searchTerm = $request->input('search');
-    
-            // List of regular searchable fields
-            $searchableFields = [
-                'name',
-                'brand',
-                'category',
-                'price',
-                'details',
-            ];
-    
-            // List of special fields (these should match 'not null' if the search term matches them)
-            $specialFields = [
-                'featured',
-                'trending',
-                'flash',
-                'offer',
-                'new',
-            ];
-    
-            // If the search term matches one of the special fields
-            if (in_array($searchTerm, $specialFields)) {
-                $query->whereNotNull($searchTerm)->orWhere($searchTerm, true);
-            } else {
-                // General search across all fields
-                $query->where(function ($q) use ($searchableFields, $searchTerm) {
-                    foreach ($searchableFields as $field) {
-                        $q->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
-                    }
-                });
-            }
-        }
-    
-        // Execute the query and paginate the results
-        $results = $query->paginate(20);
-    
-        return response()->json($results);
+    }
+
+    // Execute the query and paginate the results
+    $results = $query->paginate(20);
+
+    return response()->json($results);
     }
 
     public function maxPrice(){
