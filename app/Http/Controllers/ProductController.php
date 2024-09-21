@@ -87,6 +87,12 @@ class ProductController extends Controller {
         return response()->json($c);
     }
 
+    public function maxPrice(){
+        $maxPrice = DB::table('products')->max('price');
+    
+        return response()->json($maxPrice);
+    }
+
     public function getproductdetail( Request $request, $id ) {
         $c = DB::table( 'products' )->where( 'id', $id )->first();
         return response()->json( $c );

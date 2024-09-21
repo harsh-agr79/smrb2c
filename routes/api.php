@@ -29,6 +29,8 @@ Route::get('/product/{id}', [ProductController::class, 'getproductdetail']);
 Route::get('/brands', [BrandController::class, 'getBrands']);
 Route::get('/category', [CategoryController::class, 'getCategoryApi']);
 
+Route::get('/maxPrice', [ProductController::class, 'maxPrice']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
