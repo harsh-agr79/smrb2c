@@ -14,34 +14,34 @@ class ProductController extends Controller {
     public function getproduct(Request $request){
             $query = DB::table('products')->orderBy('ordernum', 'ASC');
             if ($request->has('brand')) {
-                $query->where('brand_id', $request->input('brand'));
+                $query->where('brand_id', $request->get('brand'));
             }
             if ($request->has('category')) {
-                $query->where('category_id', $request->input('category'));
+                $query->where('category_id', $request->get('category'));
             }
             if ($request->has('price_min')) {
-                $query->where('price', '>=', $request->input('price_min'));
+                $query->where('price', '>=', $request->get('price_min'));
             }
             if ($request->has('price_max')) {
-                $query->where('price', '<=', $request->input('price_max'));
+                $query->where('price', '<=', $request->get('price_max'));
             }
             if ($request->has('stock')) {
-                $query->where('stock', $request->input('stock'));
+                $query->where('stock', $request->get('stock'));
             }
             if ($request->has('featured')) {
-                $query->where('featured', $request->input('featured'));
+                $query->where('featured', $request->get('featured'));
             }
             if ($request->has('new')) {
-                $query->where('new', $request->input('new'));
+                $query->where('new', $request->get('new'));
             }
             if ($request->has('flash')) {
-                $query->where('flash', $request->input('new'));
+                $query->where('flash', $request->get('flash'));
             }
             if ($request->has('trending')) {
-                $query->where('trending', $request->input('new'));
+                $query->where('trending', $request->get('trending'));
             }
             if ($request->has('featured')) {
-                $query->where('featured', $request->input('new'));
+                $query->where('featured', $request->get('featured'));
             }
             // Execute the query and get the results
             $c = $query->get();
@@ -52,34 +52,34 @@ class ProductController extends Controller {
     public function getproduct2(Request $request) {
         $query = DB::table('products')->orderBy('ordernum', 'ASC');
         if ($request->has('brand')) {
-            $query->where('brand_id', $request->input('brand'));
+            $query->where('brand_id', $request->get('brand'));
         }
         if ($request->has('category')) {
-            $query->where('category_id', $request->input('category'));
+            $query->where('category_id', $request->get('category'));
         }
         if ($request->has('price_min')) {
-            $query->where('price', '>=', $request->input('price_min'));
+            $query->where('price', '>=', $request->get('price_min'));
         }
         if ($request->has('price_max')) {
-            $query->where('price', '<=', $request->input('price_max'));
+            $query->where('price', '<=', $request->get('price_max'));
         }
         if ($request->has('stock')) {
-            $query->where('stock', $request->input('stock'));
+            $query->where('stock', $request->get('stock'));
         }
         if ($request->has('featured')) {
-            $query->where('featured', $request->input('featured'));
+            $query->where('featured', $request->get('featured'));
         }
         if ($request->has('new')) {
-            $query->where('new', $request->input('new'));
+            $query->where('new', $request->get('new'));
         }
         if ($request->has('flash')) {
-            $query->where('flash', $request->input('new'));
+            $query->where('flash', $request->get('flash'));
         }
         if ($request->has('trending')) {
-            $query->where('trending', $request->input('new'));
+            $query->where('trending', $request->get('trending'));
         }
         if ($request->has('featured')) {
-            $query->where('featured', $request->input('new'));
+            $query->where('featured', $request->get('featured'));
         }
         // Execute the query and get the results
         $c = $query->paginate(20);
