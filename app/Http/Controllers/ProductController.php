@@ -12,7 +12,7 @@ use Image;
 
 class ProductController extends Controller {
     public function getproduct(Request $request){
-            $query = DB::table('products')->orderBy('ordernum', 'ASC');
+            $query = DB::table('products')->orderBy('ordernum', 'ASC')->whereNull('hide');
             if ($request->has('brand')) {
                 $query->where('brand_id', $request->get('brand'));
             }
@@ -50,7 +50,7 @@ class ProductController extends Controller {
         }
 
     public function getproduct2(Request $request) {
-        $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
+    $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
 
     // Apply filters for brand and category (arrays of IDs)
     if ($request->has('brand')) {
