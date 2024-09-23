@@ -81,7 +81,7 @@ class ProductController extends Controller {
 
     // Apply other filters (price range, stock, etc.)
     if ($request->has('new')) {
-        $query->where('new', "on");
+        $query->where('new', $request->get('new'));
     }
     if ($request->has('price_min')) {
         $query->where('price', '>=', $request->get('price_min'));
