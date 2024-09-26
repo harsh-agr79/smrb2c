@@ -18,6 +18,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\FrontController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -30,6 +31,8 @@ Route::get('/brands', [BrandController::class, 'getBrands']);
 Route::get('/category', [CategoryController::class, 'getCategoryApi']);
 
 Route::get('/maxPrice', [ProductController::class, 'maxPrice']);
+
+Route::get('/sliderimgs', [FrontController::class, 'sliderimgs']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

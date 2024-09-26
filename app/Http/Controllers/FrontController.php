@@ -57,4 +57,16 @@ class FrontController extends Controller
         DB::table('front')->where('id', $id)->delete();
         return redirect('frontsettings');
     }
+    public function sliderimgs(){
+        $res = DB::table('front')
+        ->where('type', 'image')
+        ->get(['id', 'image'])
+        ->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'path' => $item->image, // Replace 'image' with 'path'
+            ];
+        });
+        return response()->json($res, 200);
+    }
 }
