@@ -143,6 +143,10 @@ class ProductController extends Controller {
 
     // Execute the query and paginate the results
     $results = $query->paginate(20);
+    $results->getCollection()->transform(function($product) {
+        $product->variations = json_decode($product->variations, true); // Decoding JSON to associative array
+        return $product;
+    });
 
     return response()->json($results);
     }
