@@ -153,6 +153,7 @@ class ProductController extends Controller {
 
     public function getproductdetail( Request $request, $id ) {
         $c = DB::table( 'products' )->where( 'id', $id )->first();
+        $c->variations = json_decode($c->variations);
         return response()->json( $c );
     }
 
