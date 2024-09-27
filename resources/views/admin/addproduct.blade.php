@@ -91,6 +91,13 @@
                         <label> Offer :</label><input name="offer" type="text" class="browser-default inp"
                             placeholder="Offer">
                     </div> --}}
+                    <div class="col s12">
+                        <label>Product Variations:</label>
+                        <div id="variations-container">
+                            <!-- Variation template -->
+                        </div>
+                        <button type="button" id="add-variation" class="btn">Add Variation</button>
+                    </div>
                     <div class="col s12" style="margin-top: 20px;">
                         <div id="editor">
                           
@@ -202,5 +209,39 @@
                 $('#details').val(quill.root.innerHTML);
             });
         });
+
+        let variationIndex = 0;
+    document.getElementById('add-variation').addEventListener('click', function () {
+        const container = document.getElementById('variations-container');
+        const newVariation = `
+            <div class="variation-row">
+                <div class="col s12 m3">
+                    <label>Specification 1:</label>
+                    <input name="variations[${variationIndex}][specification_1]" type="text" class="browser-default inp" placeholder="Specification 1" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Specification 2:</label>
+                    <input name="variations[${variationIndex}][specification_2]" type="text" class="browser-default inp" placeholder="Specification 2" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Colors (comma-separated):</label>
+                    <input name="variations[${variationIndex}][colors]" type="text" class="browser-default inp" placeholder="e.g. Red,Blue,Green" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Price for this Variation:</label>
+                    <input name="variations[${variationIndex}][price]" type="number" class="browser-default inp" placeholder="Variation Price" required>
+                </div>
+                <div class="col s12 right-align">
+                                        <button type="button" class="btn red" onclick="removeVariation(this)">Remove</button>
+                </div>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', newVariation);
+        variationIndex++;
+    });
+
+    function removeVariation(button) {
+        let row = button.closest('.variation-row');
+        row.remove();
+    }
     </script>
 @endsection

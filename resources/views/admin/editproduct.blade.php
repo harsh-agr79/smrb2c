@@ -97,6 +97,44 @@
                         <label> Offer :</label><input name="offer" type="text" value="{{ $prod->offer }}"
                             class="browser-default inp" placeholder="Offer">
                     </div> --}}
+                    <div class="col s12">
+                        <h6>Product Variations</h6>
+                        <div id="variations-container">
+                            @php
+                            $a = 0;
+                            @endphp
+                            @if($prod->variations)
+                           
+                            @foreach (json_decode($prod->variations, true) as $variation)
+                                <div class="row variation-row">
+                                    <div class="col s3">
+                                        <label>Specification 1:</label>
+                                        <input name="variations[{{$a}}][specification_1]" type="text" class="browser-default inp" value="{{ $variation['specification_1'] }}" required>
+                                    </div>
+                                    <div class="col s3">
+                                        <label>Specification 2:</label>
+                                        <input name="variations[{{$a}}][specification_2]" type="text" class="browser-default inp" value="{{ $variation['specification_2'] }}" required>
+                                    </div>
+                                    <div class="col s3">
+                                        <label>Colors:</label>
+                                        <input name="variations[{{$a}}][colors]" type="text" class="browser-default inp" value="{{ $colorsString = implode(',', $variation['colors']); }}" required>
+                                    </div>
+                                    <div class="col s3">
+                                        <label>Price:</label>
+                                        <input name="variations[{{$a}}][price]" type="number" class="browser-default inp" value="{{ $variation['price'] }}" required>
+                                    </div>
+                                    <div class="col s12 right-align">
+                                        <button type="button" class="btn red" onclick="removeVariation(this)">Remove</button>
+                                    </div>
+                                </div>
+                                @php
+                                    $a = $a + 1;
+                                @endphp
+                            @endforeach
+                            @endif
+                        </div>
+                        <button type="button" id="add-variation" class="btn">Add Variation</button>
+                    </div>
                     <div class="col s12" style="margin-top: 20px;">
                         {{-- <label>Details :</label>
                         <textarea name="details" class="browser-default inp" value="{{ $prod->details }}" style="resize: vertical;"
@@ -223,5 +261,39 @@
                 $('#details').val(quill.root.innerHTML);
             });
         });
+
+        let variationIndex = parseInt("{{$a}}");
+        document.getElementById('add-variation').addEventListener('click', function () {
+        const container = document.getElementById('variations-container');
+        const newVariation = `
+            <div class="variation-row">
+                <div class="col s12 m3">
+                    <label>Specification 1:</label>
+                    <input name="variations[${variationIndex}][specification_1]" type="text" class="browser-default inp" placeholder="Specification 1" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Specification 2:</label>
+                    <input name="variations[${variationIndex}][specification_2]" type="text" class="browser-default inp" placeholder="Specification 2" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Colors (comma-separated):</label>
+                    <input name="variations[${variationIndex}][colors]" type="text" class="browser-default inp" placeholder="e.g. Red,Blue,Green" required>
+                </div>
+                <div class="col s12 m3">
+                    <label>Price for this Variation:</label>
+                    <input name="variations[${variationIndex}][price]" type="number" class="browser-default inp" placeholder="Variation Price" required>
+                </div>
+                <div class="col s12 right-align">
+                                        <button type="button" class="btn red" onclick="removeVariation(this)">Remove</button>
+                </div>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', newVariation);
+        variationIndex++;
+    });
+
+    function removeVariation(button) {
+        let row = button.closest('.variation-row');
+        row.remove();
+    }
     </script>
 @endsection

@@ -167,46 +167,62 @@ class ProductController extends Controller {
         return view( 'admin/addproduct', $result );
     }
 
-    public function addprod_process( Request $request ) {
-        $request->validate( [
-            'name'=>'required|unique:products,name,'.$request->post( 'id' ),
-        ] );
+    public function addprod_process(Request $request)
+    {
+        // dd($request->post());
+        $request->validate([
+            'name' => 'required|unique:products,name,' . $request->post('id'),
+            'price' => 'required|numeric',  // Main product price
+            'variations' => 'nullable|array', // Allow variations to be null
+            'variations.*.specification_1' => 'nullable|string',
+            'variations.*.specification_2' => 'nullable|string',
+            'variations.*.colors' => 'nullable|string',
+            'variations.*.price' => 'nullable|numeric'  // Variation price
+        ]);
+    
         $image = array();
-        if ( $files = $request->file( 'images' ) ) {
+        if ($files = $request->file('images')) {
             $a = 0;
-            $b = '';
-            foreach ( $files as $file ) {
-                $a = $a + 1;
+            foreach ($files as $file) {
+                $a++;
                 $ext = $file->getClientOriginalExtension();
-                $image_name = time().$a.'prod'.'.'.$ext;
-                $image_resize = Image::make( $file->getRealPath() );
-                // $image_resize->fit( 300 );
-                $image_resize->save( 'product/'.$image_name );
-                array_push( $image, 'product/'.$image_name );
+                $image_name = time() . $a . 'prod' . '.' . $ext;
+                $image_resize = Image::make($file->getRealPath());
+                $image_resize->save('product/' . $image_name);
+                array_push($image, 'product/' . $image_name);
             }
         }
-
-        DB::table( 'products' )->insert( [
-            'name'=>$request->post( 'name' ),
-            'category_id'=>$request->post( 'category_id' ),
-            'category'=>DB::table( 'categories' )->where( 'id', $request->post( 'category_id' ) )->first()->category,
-            'brand_id'=>$request->post( 'brand_id' ),
-            'brand'=>DB::table( 'brands' )->where( 'id', $request->post( 'brand_id' ) )->first()->name,
-            'stock'=>$request->post( 'stock' ),
-            'hide'=>$request->post( 'hide' ),
-            'price'=>$request->post( 'price' ),
-            'offer'=>$request->post( 'offer' ),
-            'featured'=>$request->post( 'featured' ),
-            'new'=>$request->post( 'new' ),
-            'flash'=>$request->post( 'flash' ),
-            'trending'=>$request->post( 'trending' ),
-            'details'=>$request->post( 'details' ),
-            'net'=>$request->post('net'),
-            'images'=>implode( '|', $image ),
-            'ordernum'=>100000
-        ] );
-        return redirect( '/products' );
+    
+        // Convert colors (comma-separated) to array format
+        $variations = $request->post('variations') ? array_map(function ($variation) {
+            $variation['colors'] = explode(',', $variation['colors']);
+            return $variation;
+        }, $request->post('variations')) : null; // Set to null if no variations
+    
+        DB::table('products')->insert([
+            'name' => $request->post('name'),
+            'category_id' => $request->post('category_id'),
+            'category' => DB::table('categories')->where('id', $request->post('category_id'))->first()->category,
+            'brand_id' => $request->post('brand_id'),
+            'brand' => DB::table('brands')->where('id', $request->post('brand_id'))->first()->name,
+            'stock' => $request->post('stock'),
+            'hide' => $request->post('hide'),
+            'price' => $request->post('price'), // Main product price
+            'offer' => $request->post('offer'),
+            'featured' => $request->post('featured'),
+            'new' => $request->post('new'),
+            'flash' => $request->post('flash'),
+            'trending' => $request->post('trending'),
+            'details' => $request->post('details'),
+            'net' => $request->post('net'),
+            'images' => implode('|', $image),
+            'variations' => $variations ? json_encode($variations) : null, // Store variations as JSON or null
+            'ordernum' => 100000
+        ]);
+    
+        return redirect('/products');
     }
+    
 
     public function editproduct( $id ) {
         $prod = DB::table( 'products' )->where( 'id', $id )->first();
@@ -217,60 +233,75 @@ class ProductController extends Controller {
         return view( 'admin/editproduct', $result );
     }
 
-    public function editprod_process( Request $request ) {
-        // dd($request->post());
-        $request->validate( [
-            'name'=>'required|unique:products,name,'.$request->post( 'id' ),
-        ] );
-        $image = array();
-        if ( $files = $request->file( 'images' ) ) {
+    public function editprod_process(Request $request) {
+        //dd($request->post());
+        $request->validate([
+            'name' => 'required|unique:products,name,' . $request->post('id'),
+            'price' => 'required|numeric',  // Main product price
+            'variations' => 'nullable|array', // Allow variations to be null
+            'variations.*.specification_1' => 'nullable|string',
+            'variations.*.specification_2' => 'nullable|string',
+            'variations.*.colors' => 'nullable|string',
+            'variations.*.price' => 'nullable|numeric'  // Variation price
+        ]);
+    
+        $image = [];
+        if ($files = $request->file('images')) {
             $a = 0;
-            $b = '';
-            foreach ( $files as $file ) {
-                $a = $a + 1;
+            foreach ($files as $file) {
+                $a++;
                 $ext = $file->getClientOriginalExtension();
-                $image_name = time().$a.'prod'.'.'.$ext;
-                $image_resize = Image::make( $file->getRealPath() );
+                $image_name = time() . $a . 'prod' . '.' . $ext;
+                $image_resize = Image::make($file->getRealPath());
                 $image_resize->resize(750, 750, function ($constraint) {
                     $constraint->aspectRatio();
                 });
-                $image_resize->save( 'product/'.$image_name );
-                array_push( $image, 'product/'.$image_name );
+                $image_resize->save('product/' . $image_name);
+                $image[] = 'product/' . $image_name;
             }
         }
-        $oldimg = $request->post( 'oldimg', [] );
-        $prod = DB::table( 'products' )->where( 'id', $request->post( 'id' ) )->first();
-        $dbimgs = explode( '|', $prod->images );
-        foreach ( $dbimgs as $item ) {
-            if ( in_array( $item, $oldimg ) ) {
-                array_push( $image, $item );
-            } else {
-                if ( File::exists( $item ) ) {
-                    File::delete( $item );
+    
+        // Convert colors (comma-separated) to array format, if variations exist
+        $variations = $request->post('variations') ? array_map(function ($variation) {
+            $variation['colors'] = explode(',', $variation['colors']);
+            return $variation;
+        }, $request->post('variations')) : null; // Set to null if no variations
+    
+        // Retrieve existing product data
+        $prod = DB::table('products')->where('id', $request->post('id'))->first();
+        $dbimgs = explode('|', $prod->images);
+        foreach ($dbimgs as $item) {
+            if (!in_array($item, $request->post('oldimg', []))) {
+                if (File::exists($item)) {
+                    File::delete($item);
                 }
+            } else {
+                $image[] = $item;  // Keep existing images
             }
         }
-
-        DB::table( 'products' )->where( 'id', $request->post( 'id' ) )->update( [
-            'name'=>$request->post( 'name' ),
-            'category_id'=>$request->post( 'category_id' ),
-            'category'=>DB::table( 'categories' )->where( 'id', $request->post( 'category_id' ) )->first()->category,
-            'brand_id'=>$request->post( 'brand_id' ),
-            'brand'=>DB::table( 'brands' )->where( 'id', $request->post( 'brand_id' ) )->first()->name,
-            'stock'=>$request->post( 'stock' ),
-            'hide'=>$request->post( 'hide' ),
-            'price'=>$request->post( 'price' ),
-            'offer'=>$request->post( 'offer' ),
-            'featured'=>$request->post( 'featured' ),
-            'new'=>$request->post( 'new' ),
-            'flash'=>$request->post( 'flash' ),
-            'trending'=>$request->post( 'trending' ),
-            'details'=>$request->post( 'details' ),
-            'net'=>$request->post('net'),
-            'images'=>implode( '|', $image )
-        ] );
-
-        return redirect( '/products' );
+    
+        // Update product data
+        DB::table('products')->where('id', $request->post('id'))->update([
+            'name' => $request->post('name'),
+            'category_id' => $request->post('category_id'),
+            'category' => DB::table('categories')->where('id', $request->post('category_id'))->first()->category,
+            'brand_id' => $request->post('brand_id'),
+            'brand' => DB::table('brands')->where('id', $request->post('brand_id'))->first()->name,
+            'stock' => $request->post('stock'),
+            'hide' => $request->post('hide'),
+            'price' => $request->post('price'),  // Main product price
+            'offer' => $request->post('offer'),
+            'featured' => $request->post('featured'),
+            'new' => $request->post('new'),
+            'flash' => $request->post('flash'),
+            'trending' => $request->post('trending'),
+            'details' => $request->post('details'),
+            'net' => $request->post('net'),
+            'images' => implode('|', $image),
+            'variations' => $variations ? json_encode($variations) : null  // Store variations as JSON or null
+        ]);
+    
+        return redirect('/products');
     }
 
     public function deleteproduct( Request $request, $id ) {
