@@ -93,10 +93,10 @@
                         <label>Price :</label><input name="price" value="{{ $prod->price }}" type="number"
                             class="browser-default inp" placeholder="Price" required>
                     </div>
-                    {{-- <div class="col m6 s12">
-                        <label> Offer :</label><input name="offer" type="text" value="{{ $prod->offer }}"
+                    <div class="col m6 s12">
+                        <label> Discount :</label><input name="offer" type="text" value="{{ $prod->offer }}"
                             class="browser-default inp" placeholder="Offer">
-                    </div> --}}
+                    </div>
                     <div class="col s12">
                         <h6>Product Variations</h6>
                         <div id="variations-container">

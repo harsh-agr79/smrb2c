@@ -87,10 +87,10 @@
                         <label>Price :</label><input name="price" type="number" class="browser-default inp"
                             placeholder="Price" required>
                     </div>
-                    {{-- <div class="col m6 s12">
-                        <label> Offer :</label><input name="offer" type="text" class="browser-default inp"
+                    <div class="col m6 s12">
+                        <label> Discount :</label><input name="offer" type="text" class="browser-default inp"
                             placeholder="Offer">
-                    </div> --}}
+                    </div>
                     <div class="col s12">
                         <label>Product Variations:</label>
                         <div id="variations-container">
