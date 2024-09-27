@@ -45,7 +45,10 @@ class ProductController extends Controller {
             }
             // Execute the query and get the results
             $c = $query->get();
-        
+            $c->transform(function($product) {
+                $product->variations = json_decode($product->variations, true); // Decoding JSON to associative array
+                return $product;
+            });
             return response()->json($c);
         }
 
