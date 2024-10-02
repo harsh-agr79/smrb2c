@@ -400,4 +400,11 @@ class ProductController extends Controller {
         // }
         return response()->json("Success");
     }
+
+    public function maxDiscount(){
+            $off = DB::table('products')->pluck("offer")->toArray();
+            $off2 = array_map('intval', $off);
+            $maxPrice = max($off2);
+            return response()->json($maxPrice);
+    }
 }
