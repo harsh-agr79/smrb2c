@@ -32,8 +32,8 @@ class ForgotPassword extends Mailable
         // Encrypt the email and generate the reset URL
         $resetUrl = "https://www.samarmart.com/resetpwd/".$this->email."/".$this->token;
 
-        return $this->view('emails.forgotpassword')  // The email view
-                    ->subject('SamarmartPassword Reset Request') // Add the subject here
+        return $this->subject('SamarmartPassword Reset Request')
+                    ->markdown('emails.forgotpassword')
                     ->with([
                         'name' => $this->user->name,
                         'resetUrl' => $resetUrl,
