@@ -83,4 +83,20 @@ class AuthController extends Controller
 
         return response()->json("Email Has Been Sent", 200);
     }
+
+    public function rp_validateCreds(Request $request){
+        $email = Crypt::decryptString($request->email);
+        $token = Crypt::decryptString($request->token);
+
+        $user = DB::table('users')->where('email', $email)->first();
+        if($user){
+            if(Hash::check($token, $user->token_fp) && Hash::check($email, $user->email_enc)){
+                return response()->json($request->email, 200);
+            }
+            else{
+                return response()->json("Dont Allow Reset", 400);
+            }
+        }
+        return response()->json("Dont Allow Reset", 400);
+    }
 }

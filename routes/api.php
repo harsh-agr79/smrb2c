@@ -38,6 +38,8 @@ Route::get('maxDiscount', [ProductController::class, 'maxDiscount']);
 
 Route::post('/forgotpwd', [AuthController::class, 'sendResetLinkEmail']);
 
+Route::post('/resetpwd/validatecredentials', [AuthController::class, 'rp_validateCreds']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
