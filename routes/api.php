@@ -36,6 +36,8 @@ Route::get('/sliderimgs', [FrontController::class, 'sliderimgs']);
 
 Route::get('maxDiscount', [ProductController::class, 'maxDiscount']);
 
+Route::post('/forgotpwd', [AuthController::class, 'sendResetLinkEmail']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

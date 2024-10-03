@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Mail\ForgotPassword;
 
 class AuthController extends Controller
 {
@@ -46,5 +50,37 @@ class AuthController extends Controller
         }
 
         return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+   public function sendResetLinkEmail(Request $request)
+    {
+        // Validate email
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // Find the user by email
+        $user = User::where('email', $request->email)->first();
+
+        // Create a random token for resetting password
+        $token = Str::random(60);
+
+        // Save token in password_resets table
+        \DB::table('users')->where('email', $request->email)->update(
+            [
+                'email_enc' => Hash::make($user->email),
+                'token_fp' => Hash::make($token),
+                'fp_at' => now()
+            ]
+        );
+
+        // Send reset password email
+        Mail::to($user->email)->send(new ForgotPassword($user, Crypt::encryptString($token), Crypt::encryptString($user->email)));
+
+        return response()->json("Email Has Been Sent", 200);
     }
 }
