@@ -99,4 +99,23 @@ class AuthController extends Controller
         }
         return response()->json("Dont Allow Reset", 400);
     }
+
+    public function set_newpass(Request $request){
+        $email = Crypt::decryptString($request->token);
+        $password = $request->password;
+
+        $user = DB::table('users')->where('email', $email)->first();
+        if(Hash::check($email, $user->email_enc)){
+            DB::table('users')->where('email', $email)->update([
+                 'password' => Hash::make($request->password),
+                 'email_enc'=> Str::random(60),
+                 'token_fp'=> Hash::make(Str::random(60)),
+                 'fp_at'=> NULL,
+            ]);
+            return response()->json("Password Changed", 200);
+        }
+        else{
+            return response()->json("Error", 406);
+        }
+    }
 }
