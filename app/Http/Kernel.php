@@ -52,6 +52,9 @@ class Kernel extends HttpKernel
         'MarketerAuth' => [
             \App\Http\Middleware\MarketerAuth::class,
         ],
+        'api_key' => [
+            \App\Http\Middleware\ApiKeyMiddleware::class,
+        ],
     ];
 
     /**
