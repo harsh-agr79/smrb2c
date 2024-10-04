@@ -102,6 +102,12 @@ Route::group(['middleware'=>'AdminAuth'], function(){
     Route::post('/category/addcat', [CategoryController::class, 'addcategory']);
     Route::get('/category/delcat/{id}', [CategoryController::Class, 'delcategory']);
 
+    Route::get('/terms/edit', [FrontController::class, 'editterms']);
+    Route::post('/terms/edit/process', [FrontController::class, 'editterms_process'])->name('editterms');
+
+    Route::get('/policy/edit', [FrontController::class, 'editpolicy']);
+    Route::post('/policy/edit/process', [FrontController::class, 'editpolicy_process'])->name('editpolicy');
+
     //Payments CRUD
     Route::get('payments', [PaymentController::class, 'index']);
     Route::get('addpayment', [PaymentController::class, 'addpay']);

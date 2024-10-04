@@ -69,4 +69,38 @@ class FrontController extends Controller
         });
         return response()->json($res, 200);
     }
+    public function editterms(){
+        $result['data'] =  DB::table('terms')->where('id', 1)->first();
+        return view("admin/editterms", $result);
+    }
+
+    public function editterms_process(Request $request){
+        DB::table('terms')->where('id', 1)->update([
+            'terms' => $request->post('terms')
+        ]);
+        return redirect('/');
+    }
+    public function getTerms(){
+        $terms =  DB::table('terms')->where('id', 1)->first();
+
+        return response()->json($terms->terms, 200);
+    }
+
+    public function editpolicy(){
+        $result['data'] =  DB::table('policy')->where('id', 1)->first();
+        return view("admin/editpolicy", $result);
+    }
+
+    public function editpolicy_process(Request $request){
+        DB::table('policy')->where('id', 1)->update([
+            'policy' => $request->post('policy')
+        ]);
+        return redirect('/');
+    }
+    public function getPolicy(){
+        $policy =  DB::table('policy')->where('id', 1)->first();
+
+        return response()->json($policy->policy, 200);
+    }
+
 }

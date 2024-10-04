@@ -13,10 +13,10 @@
     <title>Admin</title>
     <link rel="icon" href="{{ asset('smrlogo.png') }}">
     <link rel="stylesheet" href="{{ asset('/assets/style.css') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{asset('/icons/apple-touch-icon.png')}}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{asset('/icons/favicon-32x32.png')}}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('/icons/favicon-16x16.png')}}">
-    <link rel="mask-icon" href="{{asset('/icons/safari-pinned-tab.svg')}}" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('/icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('/icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('/icons/favicon-16x16.png') }}">
+    <link rel="mask-icon" href="{{ asset('/icons/safari-pinned-tab.svg') }}" color="#5bbad5">
     <link href="//cdn.shopify.com/s/files/1/1775/8583/t/1/assets/admin-materialize.min.css?v=8850535670742419153"
         rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Exo' rel='stylesheet'>
@@ -191,11 +191,7 @@
                             </div>
                         </li>
                     @endif --}}
-                    {{-- @if (
-                        $admin->type != 'staff' ||
-                            in_array('mainanalytics', $perms) ||
-                            in_array('sortanalytics', $perms) ||
-                            in_array('summary', $perms))
+                    {{-- @if ($admin->type != 'staff' || in_array('mainanalytics', $perms) || in_array('sortanalytics', $perms) || in_array('summary', $perms))
                         <li class="bold"><a class="collapsible-header textcol" tabindex="0">Analytics<i
                                     class="material-icons chevron textcol">chevron_left</i></a>
                             <div class="collapsible-body">
@@ -352,6 +348,10 @@
                     @if ($admin->type != 'staff' || in_array('frontsettings', $perms))
                         <li class="bold"><a href="{{ url('/frontsettings') }}" class="textcol">Front Settings<i
                                     class="material-icons textcol">settings</i></a></li>
+                        <li class="bold"><a href="{{ url('/terms/edit') }}" class="textcol">Terms and conditions<i
+                                    class="material-icons textcol">settings</i></a></li>
+                        <li class="bold"><a href="{{ url('/policy/edit') }}" class="textcol">Privacy Policy<i
+                                    class="material-icons textcol">settings</i></a></li>
                         {{-- <li class="bold"><a href="{{ url('/trash') }}" class="textcol">Recycle Bin<i
                                     class="material-icons textcol">delete</i></a></li> --}}
                     @endif
@@ -494,9 +494,9 @@
         }
     </script>
 
-<script src="https://cdn.socket.io/4.4.0/socket.io.min.js"
-integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous">
-</script>
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"
+        integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous">
+    </script>
 </body>
 
 </html>

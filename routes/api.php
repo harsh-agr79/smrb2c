@@ -36,10 +36,11 @@ Route::get('/sliderimgs', [FrontController::class, 'sliderimgs']);
 
 Route::get('maxDiscount', [ProductController::class, 'maxDiscount']);
 
+Route::get('terms', [FrontController::class, 'getTerms']);
+Route::get('policy', [FrontController::class, 'getPolicy']);
+
 Route::post('/forgotpwd', [AuthController::class, 'sendResetLinkEmail']);
-
 Route::post('/resetpwd/validatecredentials', [AuthController::class, 'rp_validateCreds']);
-
 Route::post('/resetpwd/newpwd', [AuthController::class, 'set_newpass']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
