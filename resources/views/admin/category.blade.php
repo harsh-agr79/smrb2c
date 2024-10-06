@@ -54,7 +54,7 @@
                     </div>
                     <div class="col s12">
                         <label>Image (PNG only):</label>
-                        <input id="edimage" name="image" type="file" accept="image/png" class="browser-default inp">
+                        <input id="edimage" name="image" type="file" class="browser-default inp">
                         <small>Leave blank to keep existing image.</small>
                     </div>
                     <input type="hidden" name="id" id="edid">
