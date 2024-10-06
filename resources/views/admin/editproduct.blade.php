@@ -94,8 +94,8 @@
                             class="browser-default inp" placeholder="Price" required>
                     </div>
                     <div class="col m6 s12">
-                        <label> Discount :</label><input name="offer" type="number" value="{{ $prod->offer }}"
-                            class="browser-default inp" placeholder="Discount %">
+                        <label> Discounted Price(Price After Discount):</label><input name="offer" type="number" value="{{ $prod->offer }}"
+                            class="browser-default inp" placeholder="Discount Rs.">
                     </div>
                     <div class="col s12">
                         <h6>Product Variations</h6>
