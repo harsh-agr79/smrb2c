@@ -67,18 +67,26 @@ class AuthController extends Controller {
         return redirect("https://www.samarmart.com/login?emailverified=Email_Verified");
     }
 
-    public function login( Request $request ) {
-        $credentials = $request->only( 'email', 'password' );
-
-        if ( Auth::attempt( $credentials ) ) {
+    public function login(Request $request) {
+        $credentials = $request->only('email', 'password');
+    
+        if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $token = $user->createToken( 'auth_token' )->plainTextToken;
-
-            return response()->json( [ 'token' => $token, 'user'=> $user ], 200 );
+    
+            // Check if the email is verified
+            if (!$user->hasVerifiedEmail()) {
+                return response()->json(['error' => 'Email not verified.'], 403);
+            }
+    
+            // Generate token if email is verified
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            return response()->json(['token' => $token, 'user' => $user], 200);
         }
-
-        return response()->json( [ 'error' => 'Unauthorized' ], 401 );
+    
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+    
 
     public function sendResetLinkEmail( Request $request ) {
         // Validate email
