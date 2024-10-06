@@ -14,7 +14,6 @@
                     <th>SN</th>
                     <th>Category</th>
                     <th>Image</th>
-                    <th>Actions</th>
                 </thead>
                 <tbody id="cat-tbody">
                     @php
