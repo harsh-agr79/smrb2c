@@ -48,7 +48,7 @@ class AuthController extends Controller {
 
         $request->user()->sendEmailVerificationNotification();
 
-        return redirect("https://www.samarmart.com/login");
+        return response()->json( [ 'message' => 'Verification link sent.' ], 200 );
     }
 
     public function verifyEmail( Request $request, $id, $hash ) {
@@ -64,7 +64,7 @@ class AuthController extends Controller {
 
         $user->markEmailAsVerified();
 
-        return response()->json( [ 'message' => 'Email verified successfully.' ], 200 );
+        return redirect("https://www.samarmart.com/login");
     }
 
     public function login( Request $request ) {

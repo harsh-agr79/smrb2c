@@ -47,7 +47,7 @@ Route::group(['middleware'=>'api_key'], function () {
 
     Route::get('/homecategory', [CategoryController::class, 'homeCategory']);
 
-    Route::post('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 
