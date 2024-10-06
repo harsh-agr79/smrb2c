@@ -45,6 +45,8 @@ Route::group(['middleware'=>'api_key'], function () {
     Route::post('/resetpwd/validatecredentials', [AuthController::class, 'rp_validateCreds']);
     Route::post('/resetpwd/newpwd', [AuthController::class, 'set_newpass']);
 
+    Route::get('/home/category', [CategoryController::class, 'homeCategory']);
+
     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         return $request->user();
     });

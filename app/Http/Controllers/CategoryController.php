@@ -20,6 +20,10 @@ class CategoryController extends Controller
         $category = Category::get();
         return response()->json($category, 200);
     }
+    public function homeCategory(){
+        $category = Category::whereNotNull('image')->get();
+        return response()->json($category, 200);
+    }
 
     public function getcategory($id){
         $category = Category::where('id', $id)->first();
