@@ -401,10 +401,23 @@ class ProductController extends Controller {
         return response()->json("Success");
     }
 
-    public function maxDiscount(){
-            $off = DB::table('products')->pluck("offer")->toArray();
-            $off2 = array_map('intval', $off);
-            $maxPrice = max($off2);
-            return response()->json($maxPrice);
+    public function maxDiscount() {
+        // Retrieve price and offer values from the database
+        $products = DB::table('products')->select('price', 'offer')->get();
+    
+        // Calculate discount percentages
+        $discounts = $products->map(function($product) {
+            if ($product->price > 0) {
+                return (($product->price - $product->offer) / $product->price) * 100;
+            }
+            return 0; // Avoid division by zero for products with price 0
+        });
+    
+        // Get the maximum discount percentage
+        $maxDiscountPercentage = $discounts->max();
+    
+        // Return the result as JSON
+        return response()->json($maxDiscountPercentage);
     }
+    
 }
