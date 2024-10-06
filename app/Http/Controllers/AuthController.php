@@ -17,11 +17,11 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class AuthController extends Controller {
     public function register( Request $request ) {
-        $validator = Validator::make( $request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ] );
+            'password' => ['required', 'string', 'min:8', 'regex:/[A-Za-z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/'],
+        ]);        
 
         if ( $validator->fails() ) {
             return response()->json( $validator->errors(), 422 );
@@ -68,24 +68,41 @@ class AuthController extends Controller {
     }
 
     public function login(Request $request) {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+    
+        // Apply rate limiting for login attempts
+        if (RateLimiter::tooManyAttempts('login:'.$request->ip(), 5)) {
+            return response()->json(['error' => 'Too many login attempts. Please try again later.'], 429);
+        }
+    
         $credentials = $request->only('email', 'password');
     
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
     
-            // Check if the email is verified
+            // Check if email is verified
             if (!$user->hasVerifiedEmail()) {
                 return response()->json(['error' => 'Email not verified.'], 403);
             }
     
-            // Generate token if email is verified
+            // Generate token
             $token = $user->createToken('auth_token')->plainTextToken;
+    
+            // Clear failed attempts on successful login
+            RateLimiter::clear('login:'.$request->ip());
     
             return response()->json(['token' => $token, 'user' => $user], 200);
         }
     
+        // Increment failed attempts if login fails
+        RateLimiter::hit('login:'.$request->ip());
+    
         return response()->json(['error' => 'Unauthorized'], 401);
     }
+    
     
 
     public function sendResetLinkEmail( Request $request ) {
@@ -93,6 +110,10 @@ class AuthController extends Controller {
         $validator = Validator::make( $request->all(), [
             'email' => 'required|email|exists:users,email',
         ] );
+
+        if (RateLimiter::tooManyAttempts('password-reset:'.$request->ip(), 5)) {
+            return response()->json(['error' => 'Too many password reset attempts. Please try again later.'], 429);
+        }        
 
         if ( $validator->fails() ) {
             return back()->withErrors( $validator )->withInput();
@@ -119,36 +140,49 @@ class AuthController extends Controller {
         return response()->json( 'Email Has Been Sent', 200 );
     }
 
-    public function rp_validateCreds( Request $request ) {
-        $email = Crypt::decryptString( $request->email );
-        $token = Crypt::decryptString( $request->token );
-
-        $user = DB::table( 'users' )->where( 'email', $email )->first();
-        if ( $user ) {
-            if ( Hash::check( $token, $user->token_fp ) && Hash::check( $email, $user->email_enc ) ) {
-                return response()->json( $request->email, 200 );
+    public function rp_validateCreds(Request $request) {
+        $email = Crypt::decryptString($request->email);
+        $token = Crypt::decryptString($request->token);
+    
+        $user = DB::table('users')->where('email', $email)->first();
+    
+        if ($user) {
+            // Check if the token has expired (example: 60 minutes validity)
+            $tokenExpiryTime = now()->subMinutes(60);
+            if ($user->fp_at < $tokenExpiryTime) {
+                return response()->json('Token has expired', 400);
+            }
+    
+            // Check if the token and email match
+            if (Hash::check($token, $user->token_fp) && Hash::check($email, $user->email_enc)) {
+                return response()->json($request->email, 200);
             } else {
-                return response()->json( 'Dont Allow Reset', 400 );
+                return response()->json('Invalid credentials', 400);
             }
         }
-        return response()->json( 'Dont Allow Reset', 400 );
+        return response()->json('Invalid credentials', 400);
     }
+    
 
-    public function set_newpass( Request $request ) {
-        $email = Crypt::decryptString( $request->token );
+    public function set_newpass(Request $request) {
+        $email = Crypt::decryptString($request->token);
         $password = $request->password;
-
-        $user = DB::table( 'users' )->where( 'email', $email )->first();
-        if ( Hash::check( $email, $user->email_enc ) ) {
-            DB::table( 'users' )->where( 'email', $email )->update( [
-                'password' => Hash::make( $request->password ),
-                'email_enc'=> Str::random( 60 ),
-                'token_fp'=> Hash::make( Str::random( 60 ) ),
+    
+        $user = DB::table('users')->where('email', $email)->first();
+        if (Hash::check($email, $user->email_enc)) {
+            DB::table('users')->where('email', $email)->update([
+                'password' => Hash::make($request->password),
+                'email_enc'=> Str::random(60),
+                'token_fp'=> Hash::make(Str::random(60)),
                 'fp_at'=> NULL,
-            ] );
-            return response()->json( 'Password Changed', 200 );
+            ]);
+    
+            // Revoke all tokens after password reset
+            DB::table('personal_access_tokens')->where('tokenable_id', $user->id)->delete();
+    
+            return response()->json('Password Changed', 200);
         } else {
-            return response()->json( 'Error', 406 );
+            return response()->json('Error', 406);
         }
-    }
+    }    
 }
