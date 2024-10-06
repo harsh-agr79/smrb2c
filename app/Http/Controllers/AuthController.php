@@ -14,15 +14,14 @@ use Illuminate\Support\Str;
 use App\Mail\ForgotPassword;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller {
     public function register( Request $request ) {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make( $request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'string', 'min:8', 'regex:/[A-Za-z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/'],
-        ]);        
+            'password' => 'required|string|min:8',
+        ] );
 
         if ( $validator->fails() ) {
             return response()->json( $validator->errors(), 422 );
@@ -69,41 +68,24 @@ class AuthController extends Controller {
     }
 
     public function login(Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-    
-        // Apply rate limiting for login attempts
-        if (RateLimiter::tooManyAttempts('login:'.$request->ip(), 5)) {
-            return response()->json(['error' => 'Too many login attempts. Please try again later.'], 429);
-        }
-    
         $credentials = $request->only('email', 'password');
     
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
     
-            // Check if email is verified
+            // Check if the email is verified
             if (!$user->hasVerifiedEmail()) {
                 return response()->json(['error' => 'Email not verified.'], 403);
             }
     
-            // Generate token
+            // Generate token if email is verified
             $token = $user->createToken('auth_token')->plainTextToken;
-    
-            // Clear failed attempts on successful login
-            RateLimiter::clear('login:'.$request->ip());
     
             return response()->json(['token' => $token, 'user' => $user], 200);
         }
     
-        // Increment failed attempts if login fails
-        RateLimiter::hit('login:'.$request->ip());
-    
         return response()->json(['error' => 'Unauthorized'], 401);
     }
-    
     
 
     public function sendResetLinkEmail( Request $request ) {
@@ -111,10 +93,6 @@ class AuthController extends Controller {
         $validator = Validator::make( $request->all(), [
             'email' => 'required|email|exists:users,email',
         ] );
-
-        if (RateLimiter::tooManyAttempts('password-reset:'.$request->ip(), 5)) {
-            return response()->json(['error' => 'Too many password reset attempts. Please try again later.'], 429);
-        }        
 
         if ( $validator->fails() ) {
             return back()->withErrors( $validator )->withInput();
@@ -165,25 +143,21 @@ class AuthController extends Controller {
     }
     
 
-    public function set_newpass(Request $request) {
-        $email = Crypt::decryptString($request->token);
+    public function set_newpass( Request $request ) {
+        $email = Crypt::decryptString( $request->token );
         $password = $request->password;
-    
-        $user = DB::table('users')->where('email', $email)->first();
-        if (Hash::check($email, $user->email_enc)) {
-            DB::table('users')->where('email', $email)->update([
-                'password' => Hash::make($request->password),
-                'email_enc'=> Str::random(60),
-                'token_fp'=> Hash::make(Str::random(60)),
+
+        $user = DB::table( 'users' )->where( 'email', $email )->first();
+        if ( Hash::check( $email, $user->email_enc ) ) {
+            DB::table( 'users' )->where( 'email', $email )->update( [
+                'password' => Hash::make( $request->password ),
+                'email_enc'=> Str::random( 60 ),
+                'token_fp'=> Hash::make( Str::random( 60 ) ),
                 'fp_at'=> NULL,
-            ]);
-    
-            // Revoke all tokens after password reset
-            DB::table('personal_access_tokens')->where('tokenable_id', $user->id)->delete();
-    
-            return response()->json('Password Changed', 200);
+            ] );
+            return response()->json( 'Password Changed', 200 );
         } else {
-            return response()->json('Error', 406);
+            return response()->json( 'Error', 406 );
         }
-    }    
+    }
 }
