@@ -47,10 +47,19 @@ Route::group(['middleware'=>'api_key'], function () {
 
     Route::get('/homecategory', [CategoryController::class, 'homeCategory']);
 
-    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::post('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
+    Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware(['auth:sanctum', 'throttle:6,1'])
+    ->name('verification.resend');
+
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+        Route::get('/user', function (Request $request) {
+            return $request->user();
+        });
+    });
 });
 
 
