@@ -29,7 +29,7 @@ class CategoryController extends Controller
     public function editcategory(Request $request){
         $request->validate([
             'category' => 'required|unique:categories,category,' . $request->post('id'),
-            'image' => 'nullable|image|mimes:png|max:2048', // Validate image as PNG, max 2MB
+            'image' => 'nullable|image|mimes:png,webp|max:2048', // Validate image as PNG, max 2MB
         ]);
 
         $categoryName = $request->post('category');
@@ -70,7 +70,7 @@ class CategoryController extends Controller
     public function addcategory(Request $request){
         $request->validate([
             'category' => 'required|unique:categories,category',
-            'image' => 'required|image|mimes:png|max:2048', // Validate image as PNG, max 2MB
+            'image' => 'required|image|mimes:png,webp|max:2048', // Validate image as PNG, max 2MB
         ]);
 
         $categoryName = $request->post('category');
