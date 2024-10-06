@@ -88,8 +88,8 @@
                             placeholder="Price" required>
                     </div>
                     <div class="col m6 s12">
-                        <label> Discount :</label><input name="offer" type="number" class="browser-default inp"
-                            placeholder="Discount %">
+                        <label> Discounted Price(Price after Discount) :</label><input name="offer" type="number" class="browser-default inp"
+                            placeholder="Discounted Amount">
                     </div>
                     <div class="col s12">
                         <label>Product Variations:</label>
