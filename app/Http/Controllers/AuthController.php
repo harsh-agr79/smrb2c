@@ -64,7 +64,7 @@ class AuthController extends Controller {
 
         $user->markEmailAsVerified();
 
-        return redirect("https://www.samarmart.com/login");
+        return redirect("https://www.samarmart.com/login?emailverified=true");
     }
 
     public function login( Request $request ) {
