@@ -407,7 +407,7 @@ class ProductController extends Controller {
     
         // Calculate discount percentages
         $discounts = $products->map(function($product) {
-            if ($product->price > 0) {
+            if ($product->price > 0 && $product->offer != NULL) {
                 return (($product->price - $product->offer) / $product->price) * 100;
             }
             return 0; // Avoid division by zero for products with price 0
