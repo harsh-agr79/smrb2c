@@ -55,16 +55,16 @@ class AuthController extends Controller {
         $user = User::findOrFail( $id );
 
         if ( ! hash_equals( ( string ) $hash, sha1( $user->getEmailForVerification() ) ) ) {
-            return response()->json( [ 'message' => 'Invalid verification link.' ], 400 );
+            return redirect("https://www.samarmart.com/login?emailverified=Invalid_verification_link");
         }
 
         if ( $user->hasVerifiedEmail() ) {
-            return response()->json( [ 'message' => 'Email already verified.' ], 200 );
+            return redirect("https://www.samarmart.com/login?emailverified=Email_already_verfied");
         }
 
         $user->markEmailAsVerified();
 
-        return redirect("https://www.samarmart.com/login?emailverified=true");
+        return redirect("https://www.samarmart.com/login?emailverified=Email_Verified");
     }
 
     public function login( Request $request ) {
