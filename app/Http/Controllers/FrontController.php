@@ -60,6 +60,7 @@ class FrontController extends Controller
     public function sliderimgs(){
         $res = DB::table('front')
         ->where('type', 'image')
+        ->orderBy('id', 'DESC')
         ->get(['id', 'image'])
         ->map(function ($item) {
             return [
