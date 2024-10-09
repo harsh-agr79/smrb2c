@@ -22,7 +22,7 @@ class CategoryController extends Controller
     }
     public function homeCategory() {
         // Fetch categories where image is not null
-        $categories = Category::whereNotNull('image')->get();
+        $categories = Category::orderBy('ordernum', 'ASC')->whereNotNull('image')->get();
         
         // Add the prefix 'categories/' to each image value
         $categories->map(function ($category) {
