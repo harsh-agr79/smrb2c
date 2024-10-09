@@ -101,6 +101,7 @@ Route::group(['middleware'=>'AdminAuth'], function(){
     Route::post('/category/editcat', [CategoryController::class, 'editcategory']);
     Route::post('/category/addcat', [CategoryController::class, 'addcategory']);
     Route::get('/category/delcat/{id}', [CategoryController::Class, 'delcategory']);
+    Route::post('/category/updatearrangement', [CategoryController::class, 'arrange']);
 
     Route::get('/terms/edit', [FrontController::class, 'editterms']);
     Route::post('/terms/edit/process', [FrontController::class, 'editterms_process'])->name('editterms');

@@ -11,33 +11,40 @@
         <div class="mp-card">
             <table>
                 <thead>
-                    <th>SN</th>
                     <th>Category</th>
                     <th>Image</th>
                 </thead>
-                <tbody id="cat-tbody">
-                    @php
-                        $i = 0
-                    @endphp
-                    @foreach ($data as $item)
-                        <tr oncontextmenu="rightmenu({{ $item->id }}); return false;">
-                            <td>{{ $i = $i + 1 }}</td>
-                            <td>{{ $item->category }}</td>
-                            <td>
-                                @if($item->image)
-                                    <img src="{{ asset('categories/' . $item->image) }}" alt="{{ $item->category }}" width="50" height="50">
-                                @else
-                                    N/A
-                                @endif
-                            </td>
-                            <td class="iphone">
-                                <a class="modal-trigger btn-flat" href="#menumodal" onclick="changelinkajax('editcat({{ $item->id }})','delcat({{ $item->id }})')">
-                                    <i class="material-icons">more_vert</i>
-                                </a>
-                            </td>                       
-                        </tr>
-                    @endforeach
+                <tbody id="cat-tbody" class="row_position">
+                    <form id="arrangement" method="POST">
+                        @csrf
+                        @php
+                            $a = 0;
+                        @endphp
+                        @php
+                            $i = 0;
+                        @endphp
+                        @foreach ($data as $item)
+                            <tr oncontextmenu="rightmenu({{ $item->id }}); return false;">
+                                <td>{{ $item->category }}</td>
+                                <td>
+                                    @if ($item->image)
+                                        <img src="{{ asset('categories/' . $item->image) }}" alt="{{ $item->category }}"
+                                            width="50" height="50">
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="iphone">
+                                    <a class="modal-trigger btn-flat" href="#menumodal"
+                                        onclick="changelinkajax('editcat({{ $item->id }})','delcat({{ $item->id }})')">
+                                        <i class="material-icons">more_vert</i>
+                                    </a>
+                                </td>
+                            <input type="hidden" class="prodids" name="id[]" value="{{$item->id}}">
+                            </tr>
+                        @endforeach
                 </tbody>
+            </form>
             </table>
         </div>
     </div>
@@ -50,7 +57,8 @@
                 <div class="row">
                     <div class="col s12">
                         <label>Category :</label>
-                        <input id="edcat" name="category" type="text" class="browser-default inp" placeholder="Category" required>
+                        <input id="edcat" name="category" type="text" class="browser-default inp"
+                            placeholder="Category" required>
                     </div>
                     <div class="col s12">
                         <label>Image (PNG only):</label>
@@ -74,11 +82,13 @@
                 <div class="row">
                     <div class="col s12">
                         <label>Category :</label>
-                        <input id="adcat" name="category" type="text" class="browser-default inp" placeholder="Name" required>
+                        <input id="adcat" name="category" type="text" class="browser-default inp" placeholder="Name"
+                            required>
                     </div>
                     <div class="col s12">
                         <label>Image (PNG only):</label>
-                        <input id="adimage" name="image" type="file" accept="image/png" class="browser-default inp" required>
+                        <input id="adimage" name="image" type="file" accept="image/png" class="browser-default inp"
+                            required>
                     </div>
                     <div class="col s12 center" style="margin-top: 20px;">
                         <button class="btn green darken-3">ADD</button>
@@ -115,21 +125,64 @@
         </ul>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        $(".row_position").sortable({
+            delay: 150,
+            stop: function() {
+                var selectedData = new Array();
+                $(".row_position>tr").each(function() {
+                    selectedData.push($(this).attr("id"));
+                });
+                updateOrder();
+                // console.log("hello")
+            },
+            // change: function() {
+            //     console.log('hello');
+            // }
+        });
+
+        function updateOrder(){
+            var prodid = $('.prodids')
+            prod = []
+            for (let i = 0; i < prodid.length; i++) {
+                prod.push(parseInt(prodid[i].value))
+            }
+            // console.log(prod);
+            var formdata = new FormData()
+            formdata.append('prod', prod)
+            $.ajax({
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                },
+                url: "/category/updatearrangement",
+                data: formdata,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                success: function(response) {
+                    // console.log(response)
+                    // gettotal();
+                }
+            })
+        }
+    </script>
+
     <script>
         let currentCategoryId = null; // To keep track of the category being edited or deleted
 
-        function edcat(){
+        function edcat() {
             currentCategoryId = $('#rmeditlink').attr('data-value');
             editcat(parseInt(currentCategoryId));
         }
 
-        function deletecat(){
+        function deletecat() {
             currentCategoryId = $('#rmdeletelink').attr('data-value');
             $('#delmodal').modal('open')
             $('#delconfirm').attr('data-value', currentCategoryId)
         }
 
-        function delconfirm(){
+        function delconfirm() {
             const id = $('#delconfirm').attr('data-value');
             delcat(parseInt(id));
             $('#delmodal').modal('close')
@@ -137,14 +190,14 @@
             $('#delconfirm').removeAttr('data-value');
         }
 
-        function getcatdata(){
+        function getcatdata() {
             $.ajax({
                 url: "/category/getcatdata",
                 type: "GET",
-                success: function(response){
+                success: function(response) {
                     $('#cat-tbody').empty();
                     let i = 0;
-                    $.each(response, function(key, item){
+                    $.each(response, function(key, item) {
                         $('#cat-tbody').append(`
                             <tr oncontextmenu="rightmenu(${ item.id }); return false;">
                                 <td>${++i}</td>
@@ -191,15 +244,19 @@
                 processData: false,
                 type: "POST",
                 success: function(response) {
-                    M.toast({html: 'Category Updated!'});
+                    M.toast({
+                        html: 'Category Updated!'
+                    });
                     getcatdata()
                     $('#editmodal').modal('close');
                     $('#edcat').val('')
                     $('#edid').val('')
                     $('#edimage').val('')
                 },
-                error: function(error){
-                    M.toast({html: error.responseJSON.message})
+                error: function(error) {
+                    M.toast({
+                        html: error.responseJSON.message
+                    })
                 }
             })
         })
@@ -217,35 +274,43 @@
                 processData: false,
                 type: "POST",
                 success: function(response) {
-                    M.toast({html: 'Category Added!'});
+                    M.toast({
+                        html: 'Category Added!'
+                    });
                     getcatdata()
                     $('#addmodal').modal('close');
                     $('#adcat').val('')
                     $('#adimage').val('')
                 },
-                error: function(error){
+                error: function(error) {
                     let message = 'An error occurred';
                     if (error.responseJSON && error.responseJSON.errors) {
                         message = Object.values(error.responseJSON.errors).flat().join('<br>');
                     } else if (error.responseJSON && error.responseJSON.message) {
                         message = error.responseJSON.message;
                     }
-                    M.toast({html: message})
+                    M.toast({
+                        html: message
+                    })
                 }
             })
         })
 
-        function delcat(id){
+        function delcat(id) {
             $.ajax({
                 url: "/category/delcat/" + id,
                 type: "GET",
-                success: function(response){
-                    M.toast({html: response});
+                success: function(response) {
+                    M.toast({
+                        html: response
+                    });
                     $('#menumodal').modal('close');
                     getcatdata();
                 },
-                error: function(error){
-                    M.toast({html: 'Failed to delete category.'});
+                error: function(error) {
+                    M.toast({
+                        html: 'Failed to delete category.'
+                    });
                 }
             })
         }
@@ -289,7 +354,7 @@
         }
 
         // Initialize modals (assuming you're using Materialize CSS)
-        $(document).ready(function(){
+        $(document).ready(function() {
             $('.modal').modal();
         });
     </script>

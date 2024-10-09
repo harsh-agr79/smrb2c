@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\File;
 class CategoryController extends Controller
 {
     public function index(){
-        $result['data'] = Category::get();
+        $result['data'] = Category::orderBy('ordernum', 'ASC')->get();
         return view('admin.category', $result);
     }
 
     public function getCategoryApi(){
-        $category = Category::get();
+        $category = Category::orderBy('ordernum', 'ASC')->get();
         return response()->json($category, 200);
     }
     public function homeCategory() {
@@ -128,5 +128,23 @@ class CategoryController extends Controller
         }
 
         return response()->json("Category not found!", 404);
+    }
+
+    public function arrange(Request $request){
+        $prod = $request->post('prod',[]);
+        $prod = explode(",",$prod);
+        // $a = 1;
+        for ($i=0; $i < count($prod); $i++) { 
+            DB::table('categories')->where('id', $prod[$i])->update([
+                'ordernum'=>$i+1,
+            ]);
+        }
+        // foreach($prod as $item){
+        //     DB::table("products")->where('id', $item)->update([
+        //         'ordernum'=>$a,
+        //     ]);
+        //     $a=$a+1;
+        // }
+        return response()->json("Success");
     }
 }
