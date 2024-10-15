@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\CartController;
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 ->middleware(['signed', 'throttle:6,1'])
@@ -61,6 +62,11 @@ Route::group(['middleware'=>'api_key'], function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
         });
+        Route::post('/cart/add', [CartController::class, 'addToCart']);
+        Route::post('/cart/update', [CartController::class, 'updateCart']);
+        Route::post('/cart/remove', [CartController::class, 'removeFromCart']);
+        Route::post('/cart/reduce', [CartController::class, 'reduceQuantity']);
+        Route::get('/cart', [CartController::class, 'getCart']);
     });
 });
 
