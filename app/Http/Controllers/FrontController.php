@@ -114,7 +114,7 @@ public function getPolicy() {
 public function updateBanner( Request $request, $id ) {
     // Validate the input
     $request->validate( [
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         'url' => 'required|string|max:255',
     ] );
 
