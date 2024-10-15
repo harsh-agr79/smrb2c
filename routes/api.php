@@ -67,6 +67,11 @@ Route::group(['middleware'=>'api_key'], function () {
         Route::post('/cart/remove', [CartController::class, 'removeFromCart']);
         Route::post('/cart/reduce', [CartController::class, 'reduceQuantity']);
         Route::get('/cart', [CartController::class, 'getCart']);
+
+        // Add to Wishlist
+        Route::post('/wishlist/add', [CartController::class, 'addToWishlist']);
+        Route::post('/wishlist/remove', [CartController::class, 'removeFromWishlist']);
+        Route::get('/wishlist', [CartController::class, 'getWishlist']);
     });
 });
 

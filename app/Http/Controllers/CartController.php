@@ -197,5 +197,74 @@ class CartController extends Controller
         }
     }
 
+    public function addToWishlist(Request $request)
+    {
+        $user = $request->user();
+        $wishlist = $user->wishlist ?? [];
+
+        // Check if the wishlist is a JSON string and decode it
+        if (is_string($wishlist)) {
+            $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
+        }
+
+        // Get the product ID from the request
+        $productId = $request->input('product_id');
+
+        // Check if the product already exists in the wishlist
+        if (!in_array($productId, array_column($wishlist, 'product_id'))) {
+            $wishlist[] = ['product_id' => $productId];
+        }
+
+        // Save the updated wishlist to the user
+        $user->wishlist = $wishlist;
+        $user->save();
+
+        return response()->json(['message' => 'Product added to wishlist successfully', 'wishlist' => $wishlist]);
+    }
+    public function removeFromWishlist(Request $request)
+    {
+        $user = $request->user();
+        $wishlist = $user->wishlist ?? [];
+
+        // Check if the wishlist is a JSON string and decode it
+        if (is_string($wishlist)) {
+            $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
+        }
+
+        // Get the product ID to remove
+        $productId = $request->input('product_id');
+
+        // Filter out the product from the wishlist
+        $wishlist = array_filter($wishlist, function($item) use ($productId) {
+            return $item['product_id'] != $productId;
+        });
+
+        // Save the updated wishlist to the user
+        $user->wishlist = $wishlist;
+        $user->save();
+
+        return response()->json(['message' => 'Product removed from wishlist successfully', 'wishlist' => $wishlist]);
+    }
+
+    public function getWishlist(Request $request)
+    {
+        $user = $request->user();
+        $wishlist = $user->wishlist ?? [];
+
+        // Check if the wishlist is a JSON string and decode it
+        if (is_string($wishlist)) {
+            $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
+        }
+
+        // Fetch all product data for each product in the wishlist
+        $productIds = array_column($wishlist, 'product_id');
+        $products = DB::table('products')->whereIn('id', $productIds)->get();
+
+        return response()->json(['wishlist' => $products]);
+    }
+
+
+
+
 
 }
