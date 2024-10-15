@@ -40,6 +40,7 @@ Route::group(['middleware'=>'api_key'], function () {
     Route::get('/maxPrice', [ProductController::class, 'maxPrice']);
     
     Route::get('/sliderimgs', [FrontController::class, 'sliderimgs']);
+    Route::get('/banners', [FrontController::class, 'getBanners']);
     
     Route::get('maxDiscount', [ProductController::class, 'maxDiscount']);
     

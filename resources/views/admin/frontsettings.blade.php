@@ -42,42 +42,47 @@
                 </tbody>
             </table>
         </div>
-        <div class="mp-card" style="margin-top: 10px;">
-            <div class="center">Announcement Message</div>
-            <form style="margin-top: 10px;" action="{{ route('addmsg') }}" method="POST">
-                @csrf
-                <input type="text" name="message" class="browser-default inp" @if (count($data2) > 0)
-                disabled
-            @endif autocomplete="off" placeholder="Write Message">
-                <div class="center" style="margin-top: 10px">
-                   
-                    <button class="btn green accent-4  @if (count($data2) > 0)
-                            disabled
-                        @endif">
-                        Add Message
-                    </button>
+
+        <div>
+            @foreach ($banners as $banner)
+                <div class="mp-card" style="margin-top: 10px;">
+                    <div class="center">
+                        <img src="{{asset($banner->image)}}" style="height: 100px;" alt="">
+                    </div>
+                    <form action="{{ route('updateBanner', $banner->id) }}" method="post" enctype="multipart/form-data"
+                        class="col s12 row">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="input-field col s12 m12">
+                            <div class="file-field input-field">
+                                <div class="btn green accent-4 black-text">
+                                    <span>File</span>
+                                    <input id="image" type="file" name="image" accept="image/*">
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path" placeholder="Upload new image" type="text"
+                                        value="{{ $banner->image }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-field col s12">
+                            <input type="text" name="url" value="{{ $banner->url }}" required>
+                            <label for="url">Banner URL</label>
+                        </div>
+
+                        <div class="center col s12">
+                            <button class="btn waves-effect waves-light green accent-4 black-text"
+                                onclick="M.toast({html: 'Updating Banner, Please wait...'})" type="submit"
+                                name="action">Update
+                                <i class="material-icons right black-text">send</i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </div>
-        <div class="mp-card" style="margin-top: 10px;">
-            <table>
-                <thead>
-                    <th>Message</th>
-                    <th>Delete</th>
-                </thead>
-                <tbody>
-                    @if (!$data2->isEmpty())
-                        @foreach ($data2 as $item)
-                            <tr>
-                                <td>{{ $item->message }}</td>
-                                <td><a href="{{url('delete/frontmsg/'.$item->id)}}" class="btn red">Delete</a></td>
-                            </tr>
-                        @endforeach
-                    @endif
+            @endforeach
 
-                </tbody>
-            </table>
         </div>
-
     </div>
 @endsection

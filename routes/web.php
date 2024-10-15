@@ -200,6 +200,8 @@ Route::group(['middleware'=>'AdminAuth'], function(){
     //Ajax gets
     Route::get('findcustomer', [CustomerController::class, 'getcustomer']);
     Route::get('finditem', [ProductController::class, 'getproduct']);
+
+    Route::put('/admin/banner/{id}', [FrontController::class, 'updateBanner'])->name('updateBanner');
 });
 
 Route::group(['middleware'=>'CustomerAuth'], function(){
