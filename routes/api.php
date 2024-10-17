@@ -70,8 +70,7 @@ Route::group(['middleware'=>'api_key'], function () {
         Route::get('/cart', [CartController::class, 'getCart']);
 
         // Add to Wishlist
-        Route::post('/wishlist/add', [CartController::class, 'addToWishlist']);
-        Route::post('/wishlist/remove', [CartController::class, 'removeFromWishlist']);
+        Route::post('/wishlist/toggle', [CartController::class, 'toggleWishlist']);
         Route::get('/wishlist', [CartController::class, 'getWishlist']);
     });
 });

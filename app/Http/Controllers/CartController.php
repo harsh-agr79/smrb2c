@@ -216,54 +216,46 @@ class CartController extends Controller
         }
     }
 
-    public function addToWishlist(Request $request)
-    {
-        $user = $request->user();
-        $wishlist = $user->wishlist ?? [];
+    public function toggleWishlist(Request $request)
+{
+    $user = $request->user();
+    $wishlist = $user->wishlist ?? [];
 
-        // Check if the wishlist is a JSON string and decode it
-        if (is_string($wishlist)) {
-            $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
-        }
-
-        // Get the product ID from the request
-        $productId = $request->input('product_id');
-
-        // Check if the product already exists in the wishlist
-        if (!in_array($productId, array_column($wishlist, 'product_id'))) {
-            $wishlist[] = ['product_id' => $productId];
-        }
-
-        // Save the updated wishlist to the user
-        $user->wishlist = $wishlist;
-        $user->save();
-
-        return response()->json(['message' => 'Product added to wishlist successfully', 'wishlist' => $wishlist]);
+    // Check if the wishlist is a JSON string and decode it
+    if (is_string($wishlist)) {
+        $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
     }
-    public function removeFromWishlist(Request $request)
-    {
-        $user = $request->user();
-        $wishlist = $user->wishlist ?? [];
 
-        // Check if the wishlist is a JSON string and decode it
-        if (is_string($wishlist)) {
-            $wishlist = json_decode($wishlist, true);  // Decode JSON string to array
-        }
+    // Get the product ID from the request
+    $productId = $request->input('product_id');
 
-        // Get the product ID to remove
-        $productId = $request->input('product_id');
-
-        // Filter out the product from the wishlist
-        $wishlist = array_filter($wishlist, function($item) use ($productId) {
-            return $item['product_id'] != $productId;
-        });
-
-        // Save the updated wishlist to the user
-        $user->wishlist = $wishlist;
-        $user->save();
-
-        return response()->json(['message' => 'Product removed from wishlist successfully', 'wishlist' => $wishlist]);
+    // Check if the product exists in the products table
+    $product = DB::table('products')->where('id', $productId)->first();
+    if (!$product) {
+        return response()->json(['message' => 'Product not found'], 404);
     }
+
+    // Check if the product is already in the wishlist
+    $existingKey = array_search($productId, array_column($wishlist, 'product_id'));
+
+    if ($existingKey !== false) {
+        // If the product exists in the wishlist, remove it
+        unset($wishlist[$existingKey]);
+        $message = 'Product removed from wishlist successfully';
+    } else {
+        // If the product doesn't exist, add it to the wishlist
+        $wishlist[] = ['product_id' => $productId];
+        $message = 'Product added to wishlist successfully';
+    }
+
+    // Save the updated wishlist to the user
+    $user->wishlist = json_encode(array_values($wishlist));  // Re-index the array and save as JSON
+    $user->save();
+
+    return response()->json(['message' => $message, 'wishlist' => $wishlist]);
+}
+
+    
 
     public function getWishlist(Request $request)
     {
