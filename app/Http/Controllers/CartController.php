@@ -13,35 +13,47 @@ class CartController extends Controller
     {
         $user = $request->user();
         $cart = $user->cart ?? [];
-
+    
         // Check if the cart is a JSON string and decode it
         if (is_string($cart)) {
             $cart = json_decode($cart, true);  // Decode JSON string to array
         }
-
+    
         // If the cart is empty after decoding, return an empty array
         if (empty($cart)) {
             return response()->json([]);
         }
-
+    
         // Extract product IDs from the cart
         $productIds = array_column($cart, 'product_id');
-
+    
         // Fetch product details from the database
-        $products = DB::table('products')->whereIn('id', $productIds)->get()->keyBy('id');
-
+        $products = DB::table('products')->whereIn('id', $productIds)->get();
+    
+        // Map products by their IDs for easier access
+        $productsById = $products->keyBy('id');
+    
         // Combine cart items with product data
-        $fullCart = array_map(function ($item) use ($products) {
-            $product = $products[$item['product_id']] ?? null;
-            return [
-                'product' => $product, // Include all product details
-                'quantity' => $item['quantity'],
-                'variation' => $item['variation'],
-            ];
+        $fullCart = array_map(function ($item) use ($productsById) {
+            $product = $productsById->get($item['product_id']);
+    
+            // Ensure that product exists before proceeding
+            if ($product) {
+                return [
+                    'product' => $product,  // Include all product details
+                    'quantity' => $item['quantity'],
+                    'variation' => $item['variation'],
+                ];
+            }
+            return null;  // Handle cases where the product is not found
         }, $cart);
-
-        return response()->json($fullCart);  // Return only the array of products
+    
+        // Filter out null entries (in case any product was not found)
+        $fullCart = array_filter($fullCart);
+    
+        return response()->json(array_values($fullCart));  // Return only the array of products
     }
+    
 
 
     public function addToCart(Request $request)
@@ -58,6 +70,12 @@ class CartController extends Controller
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity', 1);  // Default quantity is 1
         $variation = $request->input('variation', null);  // Variation is optional
+    
+        // Check if the product exists in the products table
+        $product = DB::table('products')->where('id', $productId)->first();
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
     
         // Check if the product already exists in the cart
         $found = false;
@@ -83,11 +101,12 @@ class CartController extends Controller
         }
     
         // Save the updated cart to the user
-        $user->cart = $cart;
+        $user->cart = json_encode($cart);  // Store the cart as JSON
         $user->save();
     
         return response()->json(['message' => 'Product added to cart successfully', 'cart' => $cart]);
     }
+    
     
 
     public function updateCart(Request $request)
