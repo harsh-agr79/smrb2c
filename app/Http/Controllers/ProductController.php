@@ -48,7 +48,15 @@ class ProductController extends Controller {
     
         // Retrieve the authenticated user and their wishlist
         $user = auth('sanctum')->user();
-        $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
+        $wishlistProductIds = [];
+
+        if ($user && !empty($user->wishlist)) {
+                $wishlist = json_decode($user->wishlist, true);
+                if (is_array($wishlist)) {
+                    // Extract the product_ids from the wishlist
+                    $wishlistProductIds = array_column($wishlist, 'product_id');
+                }
+        }
     
         // Execute the query and get the results
         $products = $query->get();
@@ -64,7 +72,7 @@ class ProductController extends Controller {
         });
     
         // Return the results as a JSON response
-        return response()->json([$products, $user]);
+        return response()->json($products);
     }
     
 
@@ -140,7 +148,15 @@ class ProductController extends Controller {
     
         // Retrieve the authenticated user and their wishlist
         $user = auth('sanctum')->user();
-        $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
+        $wishlistProductIds = [];
+
+        if ($user && !empty($user->wishlist)) {
+            $wishlist = json_decode($user->wishlist, true);
+            if (is_array($wishlist)) {
+                // Extract the product_ids from the wishlist
+                $wishlistProductIds = array_column($wishlist, 'product_id');
+            }
+        }
     
         // Execute the query and paginate the results
         $results = $query->paginate(20);
@@ -150,7 +166,7 @@ class ProductController extends Controller {
             return $product;
         });
     
-        return response()->json([$results, $user]);
+        return response()->json($results);
     }
     
 
