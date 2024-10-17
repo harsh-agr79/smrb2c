@@ -47,7 +47,7 @@ class ProductController extends Controller {
         }
     
         // Retrieve the authenticated user and their wishlist
-        $user = $request->user();
+        $user = auth('sanctum')->user();
         $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
     
         // Execute the query and get the results
@@ -139,7 +139,7 @@ class ProductController extends Controller {
         }
     
         // Retrieve the authenticated user and their wishlist
-        $user = $request->user();
+        $user = auth('sanctum')->user();
         $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
     
         // Execute the query and paginate the results
