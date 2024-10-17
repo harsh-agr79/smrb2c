@@ -62,7 +62,7 @@ class ProductController extends Controller {
         });
     
         // Return the results as a JSON response
-        return response()->json([$products, $wishlistProductIds]);
+        return response()->json([$products, $user]);
     }
     
 
@@ -148,7 +148,7 @@ class ProductController extends Controller {
             return $product;
         });
     
-        return response()->json([$results, $wishlistProductIds]);
+        return response()->json([$results, $user]);
     }
     
 
