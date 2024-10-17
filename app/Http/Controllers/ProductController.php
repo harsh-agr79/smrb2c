@@ -44,22 +44,15 @@ class ProductController extends Controller {
             $query->where('trending', $request->get('trending'));
         }
     
-        // Check if the user is logged in
-        $wishlistProductIds = [];
-        if (auth()->check()) {
-            // Retrieve wishlist product IDs for the logged-in user
-            $userId = auth()->id();
-            $wishlistProductIds = \DB::table('wishlists')
-                ->where('user_id', $userId)
-                ->pluck('product_id')
-                ->toArray(); // Get product IDs from the wishlist
-        }
+        // Retrieve the authenticated user and their wishlist
+        $user = $request->user();
+        $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
     
         // Execute the query and get the results
-        $c = $query->get();
+        $products = $query->get();
     
         // Add the wishlist field to each product and decode variations
-        $c->transform(function($product) use ($wishlistProductIds) {
+        $products->transform(function($product) use ($wishlistProductIds) {
             $product->variations = json_decode($product->variations, true); // Decode JSON to associative array
     
             // Check if the product is in the wishlist
@@ -69,127 +62,95 @@ class ProductController extends Controller {
         });
     
         // Return the results as a JSON response
-        return response()->json($c);
+        return response()->json($products);
     }
     
 
-        public function getproduct2(Request $request) {
-            // Start the product query
-            $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
-        
-            // Apply filters for brand (array of IDs or single ID)
-            if ($request->has('brand')) {
-                $brandIds = $request->get('brand');
-                if (is_string($brandIds) && preg_match('/^\[.*\]$/', $brandIds)) {
-                    $brandIds = json_decode($brandIds, true);
-                }
-                if (is_array($brandIds)) {
-                    $query->whereIn('brand_id', $brandIds);
-                } else {
-                    $query->where('brand_id', $brandIds);
-                }
+    public function getproduct2(Request $request) {
+        // Start the query for fetching products
+        $query = \DB::table('products')->whereNull('hide')->orderBy('ordernum', 'ASC');
+    
+        // Apply filters for brand and category (arrays of IDs)
+        if ($request->has('brand')) {
+            $brandIds = $request->get('brand');
+            if (is_string($brandIds) && preg_match('/^\[.*\]$/', $brandIds)) {
+                $brandIds = json_decode($brandIds, true);
             }
-        
-            // Apply filters for category (array of IDs or single ID)
-            if ($request->has('category')) {
-                $categoryIds = $request->get('category');
-                if (is_string($categoryIds) && preg_match('/^\[.*\]$/', $categoryIds)) {
-                    $categoryIds = json_decode($categoryIds, true);
-                }
-                if (is_array($categoryIds)) {
-                    $query->whereIn('category_id', $categoryIds);
-                } else {
-                    $query->where('category_id', $categoryIds);
-                }
+            if (is_array($brandIds)) {
+                $query->whereIn('brand_id', $brandIds);
+            } else {
+                $query->where('brand_id', $brandIds);
             }
-        
-            // Apply filters for other fields (price range, stock, featured, etc.)
-            if ($request->has('new')) {
-                $query->where('new', $request->get('new'));
-            }
-            if ($request->has('price_min')) {
-                $query->where('price', '>=', $request->get('price_min'));
-            }
-            if ($request->has('price_max')) {
-                $query->where('price', '<=', $request->get('price_max'));
-            }
-            if ($request->has('stock')) {
-                $query->where('stock', $request->get('stock'));
-            }
-            if ($request->has('featured')) {
-                $query->where('featured', $request->get('featured'));
-            }
-            if ($request->has('flash')) {
-                $query->where('flash', $request->get('flash'));
-            }
-            if ($request->has('trending')) {
-                $query->where('trending', $request->get('trending'));
-            }
-        
-            // Universal search logic
-            if ($request->has('search')) {
-                $searchTerm = $request->input('search');
-        
-                // List of regular searchable fields
-                $searchableFields = [
-                    'name',
-                    'brand',
-                    'category',
-                    'price',
-                    'details',
-                ];
-        
-                // List of special fields (these should match 'not null' if the search term matches them)
-                $specialFields = [
-                    'featured',
-                    'trending',
-                    'flash',
-                    'offer',
-                    'new',
-                ];
-        
-                // If the search term matches one of the special fields
-                if (in_array($searchTerm, $specialFields)) {
-                    $query->whereNotNull($searchTerm)->orWhere($searchTerm, true);
-                } else {
-                    // General search across all fields
-                    $query->where(function ($q) use ($searchableFields, $searchTerm) {
-                        foreach ($searchableFields as $field) {
-                            $q->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
-                        }
-                    });
-                }
-            }
-        
-            // Check if the user is logged in
-            $wishlistProductIds = [];
-            if (auth()->check()) {
-                // Retrieve wishlist product IDs for the logged-in user
-                $userId = auth()->id();
-                $wishlistProductIds = \DB::table('wishlists')
-                    ->where('user_id', $userId)
-                    ->pluck('product_id')
-                    ->toArray(); // Get product IDs from the wishlist
-            }
-        
-            // Execute the query and paginate the results
-            $results = $query->paginate(20);
-        
-            // Add the wishlist field to each product
-            $results->getCollection()->transform(function($product) use ($wishlistProductIds) {
-                // Decode variations JSON to associative array
-                $product->variations = json_decode($product->variations, true);
-        
-                // Check if the product is in the wishlist
-                $product->wishlist = in_array($product->id, $wishlistProductIds);
-        
-                return $product;
-            });
-        
-            // Return the results as a JSON response
-            return response()->json($results);
         }
-        
+    
+        if ($request->has('category')) {
+            $categoryIds = $request->get('category');
+            if (is_string($categoryIds) && preg_match('/^\[.*\]$/', $categoryIds)) {
+                $categoryIds = json_decode($categoryIds, true);
+            }
+            if (is_array($categoryIds)) {
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $categoryIds);
+            }
+        }
+    
+        // Apply other filters (price range, stock, etc.)
+        if ($request->has('new')) {
+            $query->where('new', $request->get('new'));
+        }
+        if ($request->has('price_min')) {
+            $query->where('price', '>=', $request->get('price_min'));
+        }
+        if ($request->has('price_max')) {
+            $query->where('price', '<=', $request->get('price_max'));
+        }
+        if ($request->has('stock')) {
+            $query->where('stock', $request->get('stock'));
+        }
+        if ($request->has('featured')) {
+            $query->where('featured', $request->get('featured'));
+        }
+        if ($request->has('flash')) {
+            $query->where('flash', $request->get('flash'));
+        }
+        if ($request->has('trending')) {
+            $query->where('trending', $request->get('trending'));
+        }
+    
+        // Universal search logic
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+    
+            $searchableFields = ['name', 'brand', 'category', 'price', 'details'];
+            $specialFields = ['featured', 'trending', 'flash', 'offer', 'new'];
+    
+            if (in_array($searchTerm, $specialFields)) {
+                $query->whereNotNull($searchTerm)->orWhere($searchTerm, true);
+            } else {
+                $query->where(function ($q) use ($searchableFields, $searchTerm) {
+                    foreach ($searchableFields as $field) {
+                        $q->orWhere($field, 'LIKE', '%' . $searchTerm . '%');
+                    }
+                });
+            }
+        }
+    
+        // Retrieve the authenticated user and their wishlist
+        $user = $request->user();
+        $wishlistProductIds = $user ? (json_decode($user->wishlist, true) ?? []) : [];
+    
+        // Execute the query and paginate the results
+        $results = $query->paginate(20);
+        $results->getCollection()->transform(function($product) use ($wishlistProductIds) {
+            $product->variations = json_decode($product->variations, true); // Decode JSON to associative array
+            $product->wishlist = in_array($product->id, $wishlistProductIds); // Add wishlist field
+            return $product;
+        });
+    
+        return response()->json($results);
+    }
+    
 
     public function maxPrice(){
         $maxPrice = DB::table('products')->max('price');
